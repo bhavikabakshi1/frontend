@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClarityShield — Professional Insurance Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#fdf6f0;--navy2:#fff9f5;--navy3:#fef0f8;
+  --gold:#e8829e;--gold2:#f4a7be;--gold3:#fce8f0;
+  --teal:#3aab7a;--teal2:#27856a;
+  --rose:#d4547a;--rose2:#c03060;
+  --white:#2a1a24;--white2:#6b4858;--white3:#a08090;
+  --card:rgba(255,255,255,0.75);--card2:rgba(255,255,255,0.9);
+  --border:rgba(232,130,158,0.2);--border2:rgba(232,130,158,0.4);
+  --shadow:0 8px 40px rgba(180,80,120,0.12);
+  --rad:20px;--rad2:14px;--rad3:10px;
+  --glow:0 0 40px rgba(232,130,158,0.2);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#fdf6f0;color:#2a1a24;min-height:100vh;overflow-x:hidden}
+/* CANVAS 3D background */
+#bg3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.6}
+.layer{position:relative;z-index:1}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:14px 0;background:rgba(253,246,240,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border2)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold);cursor:pointer;letter-spacing:0.5px;display:flex;align-items:center;gap:10px}
+.logo-shield{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 4px 16px rgba(201,168,76,0.4)}
+.nav-links{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.nb{padding:8px 14px;border-radius:50px;border:1px solid transparent;background:transparent;color:#a08090;cursor:pointer;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;transition:.2s;letter-spacing:0.2px}
+.nb:hover,.nb.active{background:rgba(252,232,240,0.8);border-color:rgba(232,130,158,0.4);color:#d4547a}
+.nb.cta{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;font-weight:700;border:none;padding:8px 18px;box-shadow:0 4px 14px rgba(232,130,158,0.3)}
+.nb.cta:hover{opacity:.9;transform:translateY(-1px)}
+/* PAGE SYSTEM */
+.page{display:none;min-height:100vh;padding-top:74px;animation:fadeUp .4s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+/* AUTH MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.auth-modal{background:linear-gradient(160deg,#fff9f5,#fdf0f8);border:1px solid rgba(232,130,158,0.4);border-radius:28px;padding:44px 38px;width:100%;max-width:456px;position:relative;box-shadow:0 40px 100px rgba(180,80,120,0.2)}
+.auth-modal::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:180px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:50%}
+.auth-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(252,232,240,0.8);border:1px solid rgba(232,130,158,0.3);color:#a08090;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.auth-tabs{display:flex;gap:0;background:rgba(240,228,212,0.5);border-radius:50px;padding:4px;margin-bottom:28px;border:1px solid rgba(232,130,158,0.2)}
+.auth-tab{flex:1;padding:10px;border-radius:50px;border:none;background:transparent;color:#a08090;cursor:pointer;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;transition:.25s}
+.auth-tab.active{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;font-weight:700}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo .logo-big{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);font-weight:700}
+.auth-logo p{font-size:13px;color:var(--white3);margin-top:4px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--white3);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase}
+.field input{width:100%;padding:13px 16px;background:#fff;border:1.5px solid rgba(232,130,158,0.4);border-radius:var(--rad3);color:#2a1a24;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:.25s}
+.field input:focus{border-color:#e8829e;background:#fff;box-shadow:0 0 0 4px rgba(232,130,158,0.1)}
+.field input::placeholder{color:#a08090;opacity:.7}
+.btn-auth{width:100%;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.25s;margin-top:8px;box-shadow:0 6px 20px rgba(232,130,158,0.35)}
+.btn-auth:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,130,158,0.4)}
+.auth-divider{text-align:center;margin:20px 0;font-size:12px;color:var(--white3);position:relative}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:var(--border)}
+.auth-divider::before{left:0}.auth-divider::after{right:0}
+.btn-guest{width:100%;padding:13px;border-radius:50px;border:1.5px solid rgba(232,130,158,0.4);background:transparent;color:#6b4858;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.25s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-guest:hover{background:rgba(252,232,240,0.8);border-color:#e8829e;color:#d4547a}
+.auth-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.btn-social{padding:11px;border-radius:var(--rad3);border:1.5px solid rgba(232,130,158,0.25);background:rgba(255,255,255,0.8);color:#2a1a24;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-social:hover{border-color:#e8829e;background:rgba(252,232,240,0.6)}
+.guest-banner{background:rgba(232,130,158,0.1);border:1px solid rgba(232,130,158,0.4);border-radius:var(--rad3);padding:13px 16px;margin-bottom:18px;font-size:13px;color:#d4547a;display:flex;align-items:center;gap:10px}
+/* HERO */
+.hero{max-width:1200px;margin:0 auto;padding:80px 32px 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+@media(max-width:800px){.hero{grid-template-columns:1fr;padding:40px 20px}}
+.hero-text .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:50px;background:rgba(252,232,240,0.8);border:1px solid rgba(232,130,158,0.4);font-size:12px;color:#d4547a;font-weight:600;margin-bottom:22px;letter-spacing:0.4px}
+.hero-text h1{font-family:'Playfair Display',serif;font-size:clamp(34px,5vw,58px);font-weight:900;line-height:1.06;margin-bottom:18px;letter-spacing:-1px;color:#2a1a24}
+.hero-text h1 .accent{background:linear-gradient(135deg,#e8829e,#c8b090);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-text p{font-size:16px;color:#6b4858;line-height:1.75;margin-bottom:34px;font-weight:300}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-hero{padding:16px 32px;border-radius:50px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.25s;letter-spacing:0.3px}
+.btn-hero-primary{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;border:none;box-shadow:0 8px 28px rgba(232,130,158,0.35)}
+.btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(232,130,158,0.45)}
+.btn-hero-outline{background:#fff;border:2px solid rgba(232,130,158,0.4);color:#6b4858}
+.btn-hero-outline:hover{background:rgba(252,232,240,0.8);border-color:#e8829e;color:#d4547a;transform:translateY(-2px)}
+/* 3D CARD (hero right) */
+.hero-3d{position:relative;height:420px;perspective:1000px}
+.card-3d{width:100%;height:100%;transform-style:preserve-3d;animation:float3d 6s ease-in-out infinite;position:relative}
+@keyframes float3d{0%,100%{transform:rotateX(8deg) rotateY(-12deg) translateY(0)}50%{transform:rotateX(12deg) rotateY(-8deg) translateY(-12px)}}
+.card-face{position:absolute;width:100%;height:100%;border-radius:28px;padding:30px;background:linear-gradient(145deg,rgba(255,255,255,0.92),rgba(255,240,248,0.85));border:1.5px solid rgba(232,130,158,0.4);backdrop-filter:blur(20px);box-shadow:0 32px 80px rgba(180,80,120,0.18),inset 0 1px 0 rgba(255,255,255,0.9)}
+.card-face::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(232,130,158,0.7),transparent);border-radius:28px 28px 0 0}
+.shield-3d{width:80px;height:80px;margin-bottom:20px;filter:drop-shadow(0 8px 24px rgba(201,168,76,0.4))}
+.card-face h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#d4547a;margin-bottom:7px}
+.card-face p{font-size:13px;color:#6b4858;line-height:1.6;margin-bottom:20px}
+.coverage-pills{display:flex;flex-wrap:wrap;gap:8px}
+.cpill{padding:5px 13px;border-radius:50px;font-size:12px;font-weight:600;background:rgba(252,232,240,0.8);border:1px solid rgba(232,130,158,0.3);color:#d4547a}
+.cpill.safe{background:rgba(58,171,122,0.1);border-color:rgba(58,171,122,0.35);color:#27856a}
+.cpill.risk{background:rgba(212,84,122,0.1);border-color:rgba(212,84,122,0.3);color:#c03060}
+.card-score{position:absolute;bottom:32px;right:32px;text-align:right}
+.score-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;color:#e8829e;line-height:1}
+.score-label{font-size:10px;color:#a08090;text-transform:uppercase;letter-spacing:1.2px;margin-top:2px}
+/* STATS BAR */
+.stats-bar{background:linear-gradient(90deg,rgba(252,232,240,0.6),rgba(240,228,212,0.5),rgba(252,232,240,0.6));border-top:1px solid rgba(232,130,158,0.2);border-bottom:1px solid rgba(232,130,158,0.2);padding:22px 0}
+.stats-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px}
+.stat{text-align:center}
+.stat-num{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:#e8829e;display:block}
+.stat-label{font-size:12px;color:#a08090;letter-spacing:0.4px;margin-top:3px}
+/* SECTIONS */
+.section{padding:60px 0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+.sec-title{text-align:center;margin-bottom:48px}
+.sec-title h2{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,42px);font-weight:700;margin-bottom:12px;letter-spacing:-0.5px}
+.sec-title h2 .g{background:linear-gradient(135deg,#e8829e,#c8b090);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-title p{font-size:15px;color:#6b4858;max-width:500px;margin:0 auto;line-height:1.7}
+/* FEATURE CARDS */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.feat-card{background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:26px;cursor:pointer;transition:.35s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,130,158,0.07),transparent);opacity:0;transition:.35s}
+.feat-card:hover::before{opacity:1}
+.feat-card:hover{border-color:rgba(232,130,158,0.4);transform:translateY(-6px);box-shadow:0 0 40px rgba(232,130,158,0.2),0 12px 40px rgba(180,80,120,0.12)}
+.feat-ico{font-size:32px;margin-bottom:16px;display:block}
+.feat-card h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#d4547a;margin-bottom:8px}
+.feat-card p{font-size:13px;color:#6b4858;line-height:1.6}
+.feat-arrow{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12px;color:#e8829e;font-weight:700;letter-spacing:0.4px}
+/* INVESTMENT REALITY CHECK */
+.reality-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+@media(max-width:700px){.reality-wrap{grid-template-columns:1fr}}
+.reality-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:28px;position:relative}
+.reality-card.insurance-col{border-left:3px solid var(--gold)}
+.reality-card.invest-col{border-left:3px solid var(--teal)}
+.reality-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.reality-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ri-ins{background:rgba(201,168,76,0.15)}
+.ri-inv{background:rgba(26,191,191,0.15)}
+.reality-head h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.reality-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.reality-row:last-child{border-bottom:none}
+.reality-check{font-size:14px;width:18px;flex-shrink:0;margin-top:1px}
+.reality-text{font-size:13px;color:var(--white3);line-height:1.5}
+.verdict-bar{background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(26,191,191,0.06));border:1px solid var(--border);border-radius:var(--rad);padding:24px 28px;text-align:center}
+.verdict-bar h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2);margin-bottom:10px}
+.verdict-bar p{font-size:14px;color:var(--white3);line-height:1.7;max-width:600px;margin:0 auto}
+/* UNDERINSURANCE ALERT ENGINE */
+.alert-form{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:32px;margin-bottom:28px}
+.alert-form h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold2);margin-bottom:24px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.form-field{display:flex;flex-direction:column;gap:8px}
+.form-field label{font-size:12px;font-weight:600;color:var(--white3);letter-spacing:0.8px;text-transform:uppercase}
+.form-field input,.form-field select{padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--rad3);color:var(--white);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s}
+.form-field input:focus,.form-field select:focus{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.form-field select option{background:var(--navy2);color:var(--white)}
+.btn-analyze{padding:14px 32px;border-radius:50px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:var(--navy);font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.25s}
+.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,168,76,0.3)}
+.alert-results{display:none}
+.alert-results.show{display:block}
+.alert-summary{background:linear-gradient(135deg,rgba(232,93,138,0.12),rgba(232,93,138,0.04));border:1px solid rgba(232,93,138,0.35);border-radius:var(--rad);padding:24px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.alert-icon-big{font-size:40px;flex-shrink:0}
+.alert-text h4{font-family:'Playfair Display',serif;font-size:20px;color:var(--rose2);margin-bottom:6px}
+.alert-text p{font-size:14px;color:var(--white3);line-height:1.6}
+.alert-items{display:flex;flex-direction:column;gap:12px}
+.alert-item{background:var(--card);border:1px solid var(--border);border-radius:var(--rad2);padding:18px 20px;display:flex;align-items:center;gap:16px}
+.alert-item.danger{border-left:3px solid var(--rose)}
+.alert-item.warn{border-left:3px solid var(--gold)}
+.alert-item.ok{border-left:3px solid var(--teal)}
+.alert-indicator{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.ind-danger{background:rgba(232,93,138,0.2)}
+.ind-warn{background:rgba(201,168,76,0.2)}
+.ind-ok{background:rgba(26,191,191,0.2)}
+.alert-detail{flex:1}
+.alert-detail h5{font-size:14px;font-weight:600;margin-bottom:4px}
+.alert-detail p{font-size:12px;color:var(--white3)}
+.alert-gap{text-align:right;font-size:13px;font-weight:700}
+.gap-danger{color:var(--rose2)}
+.gap-warn{color:var(--gold2)}
+.gap-ok{color:var(--teal2)}
+/* BIAS DETECTOR */
+.bias-wrap{max-width:800px;margin:0 auto}
+.bias-input{background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:28px;margin-bottom:24px}
+.bias-input h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2);margin-bottom:16px}
+.bias-textarea{width:100%;padding:16px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--rad2);color:var(--white);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:120px;transition:.2s;line-height:1.6}
+.bias-textarea:focus{border-color:var(--gold)}
+.bias-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;margin-bottom:16px}
+.preset-btn{padding:7px 14px;border-radius:50px;border:1px solid var(--border);background:var(--card);color:var(--white3);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s}
+.preset-btn:hover{border-color:var(--border2);color:var(--gold)}
+.bias-results{display:none;animation:fadeUp .4s ease}
+.bias-results.show{display:block}
+.bias-score-wrap{display:flex;align-items:center;gap:24px;margin-bottom:24px;flex-wrap:wrap}
+.bias-gauge{position:relative;width:120px;height:120px;flex-shrink:0}
+.bias-gauge svg{transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:8}
+.gauge-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+.gauge-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge-pct{font-family:'Playfair Display',serif;font-size:24px;font-weight:700}
+.gauge-sub{font-size:10px;color:var(--white3);letter-spacing:1px}
+.bias-summary{flex:1}
+.bias-summary h4{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold2);margin-bottom:8px}
+.bias-summary p{font-size:13px;color:var(--white3);line-height:1.6}
+.bias-categories{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.bias-cat{background:var(--card);border:1px solid var(--border);border-radius:var(--rad2);padding:16px}
+.bias-cat-name{font-size:12px;font-weight:600;color:var(--white3);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.bias-bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;margin-bottom:8px}
+.bias-bar-fill{height:100%;border-radius:50px;transition:width 1s ease}
+.bias-cat-val{font-size:12px;color:var(--white3)}
+/* QUIZ */
+.quiz-wrap{max-width:680px;margin:0 auto}
+.quiz-progress{display:flex;gap:4px;margin-bottom:28px}
+.qp{flex:1;height:3px;border-radius:50px;background:rgba(200,176,144,0.3);transition:.4s}
+.qp.done{background:var(--teal)}
+.qp.active{background:var(--gold)}
+.quiz-card{background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:32px;box-shadow:0 8px 40px rgba(180,80,120,0.12)}
+.quiz-card::before{content:'';position:absolute;display:none}
+.quiz-q{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;line-height:1.4;color:#2a1a24}
+.quiz-hint{font-size:13px;color:#6b4858;margin-bottom:24px;padding:11px 15px;background:rgba(252,232,240,0.6);border:1px solid rgba(232,130,158,0.25);border-radius:var(--rad3)}
+.quiz-opts{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{padding:14px 18px;border-radius:var(--rad2);border:1.5px solid rgba(200,176,144,0.35);background:#fff;font-size:14px;cursor:pointer;transition:.25s;text-align:left;color:#2a1a24;display:flex;align-items:center;gap:11px;font-family:'DM Sans',sans-serif}
+.quiz-opt:hover{border-color:#e8829e;background:rgba(252,232,240,0.6);color:#d4547a}
+.quiz-opt.selected{border-color:#e8829e;background:rgba(252,232,240,0.7);color:#d4547a}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.q-count{font-size:13px;color:#a08090}
+.btn-qnav{padding:9px 22px;border-radius:50px;border:1.5px solid rgba(232,130,158,0.3);background:transparent;color:#a08090;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.btn-qnav:hover{border-color:#e8829e;color:#d4547a}
+.btn-qnav.cta-q{background:linear-gradient(135deg,#e8829e,#d4547a);border:none;color:#fff}
+.result-card{background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:38px;text-align:center}
+.result-score{font-family:'Playfair Display',serif;font-size:72px;font-weight:900;background:linear-gradient(135deg,#e8829e,#c8b090);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.result-label{font-size:20px;font-weight:600;margin:8px 0 16px}
+.result-tips{text-align:left;margin-top:28px}
+.tip-item{display:flex;gap:11px;padding:14px;border-radius:var(--rad2);background:rgba(252,232,240,0.6);border:1px solid rgba(232,130,158,0.25);margin-bottom:9px;font-size:13px;line-height:1.6;color:#6b4858}
+/* COVERAGE MAP */
+.viz-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.viz-tab{padding:9px 18px;border-radius:50px;border:1.5px solid rgba(232,130,158,0.2);background:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:.25s;color:#a08090;font-family:'DM Sans',sans-serif}
+.viz-tab.active,.viz-tab:hover{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;border-color:transparent;font-weight:700}
+.coverage-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:24px}
+.cov-cell{border-radius:var(--rad2);padding:22px;text-align:center;cursor:pointer;transition:.35s;position:relative;overflow:hidden}
+.cov-cell:hover{transform:translateY(-4px) scale(1.02)}
+.cov-cell.green{background:rgba(58,171,122,0.08);border:1.5px solid rgba(58,171,122,0.3)}
+.cov-cell.amber{background:rgba(212,134,42,0.08);border:1.5px solid rgba(212,134,42,0.3)}
+.cov-cell.red{background:rgba(212,84,122,0.08);border:1.5px solid rgba(212,84,122,0.3)}
+.cov-ico{font-size:26px;margin-bottom:10px}
+.cov-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.cov-pct{font-size:24px;font-weight:700}
+.cov-cell.green .cov-pct{color:#27856a}
+.cov-cell.amber .cov-pct{color:#d4862a}
+.cov-cell.red .cov-pct{color:#d4547a}
+.cov-bar-wrap{height:3px;background:rgba(200,176,144,0.25);border-radius:50px;margin-top:8px;overflow:hidden}
+.cov-bar-fill{height:100%;border-radius:50px;transition:width 1.2s ease}
+.cov-cell.green .cov-bar-fill{background:#3aab7a}
+.cov-cell.amber .cov-bar-fill{background:#d4862a}
+.cov-cell.red .cov-bar-fill{background:#d4547a}
+.cov-detail{border-radius:var(--rad2);padding:20px;border:1.5px solid rgba(232,130,158,0.3);background:rgba(252,232,240,0.4);margin-top:4px}
+.cov-detail h4{font-size:14px;font-weight:700;margin-bottom:11px;color:#d4547a}
+.cov-dr{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid rgba(232,130,158,0.15);color:#6b4858}
+.cov-dr:last-child{border-bottom:none}
+.cov-dr strong{color:#2a1a24}
+.viz-legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:#a08090}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+/* SIMULATOR */
+.sim-scenarios{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.scen-btn{padding:13px 9px;border-radius:var(--rad2);border:1.5px solid rgba(200,176,144,0.35);background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:.25s;color:#a08090;text-align:center;line-height:1.6;font-family:'DM Sans',sans-serif}
+.scen-btn.active,.scen-btn:hover{border-color:#e8829e;background:rgba(252,232,240,0.6);color:#d4547a}
+.sim-result{border-radius:var(--rad2);overflow:hidden;border:1.5px solid rgba(232,130,158,0.2)}
+.sim-header{padding:16px 20px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.sim-body{padding:14px;display:flex;flex-direction:column;gap:7px;background:rgba(255,255,255,0.9)}
+.sim-row{display:flex;align-items:center;gap:11px;font-size:13px;padding:11px 13px;border-radius:var(--rad3);background:rgba(255,255,255,0.7);color:#2a1a24}
+.sim-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.covered .sim-dot{background:#3aab7a}
+.not-covered .sim-dot{background:#d4547a}
+.partial .sim-dot{background:#d4862a}
+.sim-amt{font-weight:700;margin-left:auto;padding-left:12px;white-space:nowrap}
+.covered .sim-amt{color:#27856a}
+.not-covered .sim-amt{color:#d4547a}
+.partial .sim-amt{color:#d4862a}
+.sim-total{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;border-radius:var(--rad2);padding:15px 19px;margin-top:11px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+/* PLANS */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.plan-card{background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:26px;transition:.35s;position:relative}
+.plan-card:hover{transform:translateY(-6px);box-shadow:0 20px 56px rgba(180,80,120,0.15)}
+.plan-card.popular{border-color:#e8829e}
+.plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;font-size:11px;font-weight:700;padding:3px 15px;border-radius:50px;white-space:nowrap}
+.plan-name{font-size:12px;font-weight:700;color:#a08090;margin-bottom:7px;letter-spacing:0.7px;text-transform:uppercase}
+.plan-price{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:#2a1a24;margin-bottom:4px}
+.plan-price span{font-size:15px;color:#a08090;font-family:'DM Sans',sans-serif;font-weight:400}
+.plan-desc{font-size:13px;color:#6b4858;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(232,130,158,0.15);line-height:1.5}
+.plan-feats{list-style:none;margin-bottom:24px}
+.plan-feats li{font-size:13px;padding:6px 0;display:flex;gap:9px;align-items:flex-start;color:#a08090}
+.plan-feats li.yes{color:#2a1a24}
+.pf-tick{font-size:12px;flex-shrink:0;margin-top:1px}
+.plan-feats li.yes .pf-tick{color:#3aab7a}
+.plan-feats li.no .pf-tick{color:#d4547a;opacity:.5}
+.plan-feats li.no{opacity:.5}
+.plan-btn{width:100%;padding:12px;border-radius:50px;border:1.5px solid rgba(232,130,158,0.35);background:transparent;color:#e8829e;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.25s}
+.plan-btn:hover,.plan-card.popular .plan-btn{background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;border-color:transparent}
+/* GLOSSARY */
+.gloss-search{width:100%;padding:13px 20px;border-radius:50px;border:1.5px solid rgba(232,130,158,0.3);background:#fff;color:#2a1a24;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:22px}
+.gloss-search:focus{border-color:#e8829e}
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.gloss-card{background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.15);border-radius:var(--rad2);padding:18px;transition:.25s}
+.gloss-card:hover{border-color:rgba(232,130,158,0.35);background:rgba(252,232,240,0.4)}
+.gloss-term{font-size:15px;font-weight:700;color:#d4547a;margin-bottom:7px;font-family:'Playfair Display',serif}
+.gloss-def{font-size:13px;color:#6b4858;line-height:1.6}
+.gloss-ex{font-size:12px;color:#a08090;margin-top:7px;font-style:italic;line-height:1.5}
+/* CLAIMS */
+.flow-step{display:flex;gap:18px;position:relative;margin-bottom:0}
+.flow-step:not(:last-child)::before{content:'';position:absolute;left:20px;top:44px;width:2px;height:calc(100% - 10px);background:linear-gradient(180deg,rgba(232,130,158,0.5),transparent)}
+.flow-num{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;box-shadow:0 4px 14px rgba(232,130,158,0.35)}
+.flow-content{flex:1;padding-bottom:32px}
+.flow-content h4{font-size:16px;font-weight:700;color:#d4547a;margin-bottom:7px;font-family:'Playfair Display',serif}
+.flow-content p{font-size:13px;color:#6b4858;line-height:1.6}
+.flow-tip{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:12px;padding:5px 13px;border-radius:50px;background:rgba(252,232,240,0.6);color:#d4547a;border:1px solid rgba(232,130,158,0.25)}
+/* 3D FLOATING ELEMENTS */
+.float-orb{position:absolute;border-radius:50%;pointer-events:none;animation:orb-float 8s ease-in-out infinite}
+@keyframes orb-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+/* FOOTER */
+footer{background:rgba(240,228,212,0.6);border-top:1px solid rgba(232,130,158,0.2);padding:28px 0;text-align:center}
+footer p{font-size:13px;color:#a08090}
+footer .foot-links{display:flex;gap:20px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+footer .foot-links a{color:#a08090;text-decoration:none;font-size:12px;transition:.2s}
+footer .foot-links a:hover{color:#d4547a}
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;background:linear-gradient(135deg,#e8829e,#d4547a);color:#fff;padding:13px 22px;border-radius:50px;font-size:14px;font-weight:700;transform:translateY(80px);opacity:0;transition:.4s;pointer-events:none;box-shadow:0 8px 28px rgba(232,130,158,0.35)}
+.toast.show{transform:none;opacity:1}
+/* 3D CUBE DECORATION */
+.cube-scene{perspective:600px;display:inline-block}
+.cube{width:60px;height:60px;transform-style:preserve-3d;animation:spin-cube 12s linear infinite}
+@keyframes spin-cube{from{transform:rotateX(25deg) rotateY(0)}to{transform:rotateX(25deg) rotateY(360deg)}}
+.cube-face{position:absolute;width:60px;height:60px;border:1.5px solid rgba(232,130,158,0.5);display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(252,232,240,0.4);backdrop-filter:blur(4px)}
+.cube-face.front{transform:translateZ(30px)}
+.cube-face.back{transform:translateZ(-30px) rotateY(180deg)}
+.cube-face.left{transform:rotateY(-90deg) translateZ(30px)}
+.cube-face.right{transform:rotateY(90deg) translateZ(30px)}
+.cube-face.top{transform:rotateX(90deg) translateZ(30px)}
+.cube-face.bottom{transform:rotateX(-90deg) translateZ(30px)}
+/* 3D HERO GRID */
+.perspective-grid{position:absolute;bottom:0;left:0;right:0;height:200px;overflow:hidden;pointer-events:none}
+.perspective-grid svg{width:100%;height:100%;opacity:0.15}
+/* USER BADGE */
+.user-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:50px;background:rgba(252,232,240,0.8);border:1px solid rgba(232,130,158,0.35);font-size:13px;color:#d4547a;font-weight:600}
+.user-avatar{width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,#e8829e,#d4547a);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- 3D BACKGROUND CANVAS -->
+<canvas id="bg3d"></canvas>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-logo">
+      <div class="logo-big">🛡️ ClarityShield</div>
+      <p>Professional Insurance Intelligence Platform</p>
+    </div>
+    <div id="guestBanner" class="guest-banner" style="display:none">
+      👁️ <span>You're viewing as a Guest. Create an account to save your data and access all features.</span>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+    <div id="auth-login">
+      <div class="auth-social">
+        <button class="btn-social" onclick="socialLogin('Google')">🔵 Google</button>
+        <button class="btn-social" onclick="socialLogin('Apple')">🍎 Apple</button>
+      </div>
+      <div class="auth-divider">or sign in with email</div>
+      <div class="field"><label>Email Address</label><input type="email" id="login-email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-auth" onclick="doLogin()">Sign In to ClarityShield</button>
+      <div class="auth-divider" style="margin-top:20px">or</div>
+      <button class="btn-guest" onclick="guestLogin()">👁️ Continue as Guest &nbsp;·&nbsp; <span style="font-size:11px;opacity:.7">Limited preview access</span></button>
+    </div>
+    <div id="auth-register" style="display:none">
+      <div class="field"><label>Full Name</label><input type="text" id="reg-name" placeholder="Alex Johnson"></div>
+      <div class="field"><label>Email Address</label><input type="email" id="reg-email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="Create a strong password"></div>
+      <div class="field"><label>Policy Type</label>
+        <select id="reg-policy" style="padding:14px 18px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:14px;font-family:'DM Sans',sans-serif;width:100%;outline:none">
+          <option value="">Select your primary insurance type</option>
+          <option>Home Insurance</option><option>Auto Insurance</option><option>Health Insurance</option><option>Life Insurance</option><option>Business Insurance</option>
+        </select>
+      </div>
+      <button class="btn-auth" onclick="doRegister()">Create My Account</button>
+      <div class="auth-divider" style="margin-top:20px">or</div>
+      <button class="btn-guest" onclick="guestLogin()">👁️ Continue as Guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="goPage('home')">
+      <div class="logo-shield">🛡️</div>
+      ClarityShield
+    </div>
+    <div class="nav-links">
+      <button class="nb" id="nb-home" onclick="goPage('home')">Home</button>
+      <button class="nb" id="nb-quiz" onclick="goPage('quiz')">Quiz</button>
+      <button class="nb" id="nb-viz" onclick="goPage('viz')">Coverage Map</button>
+      <button class="nb" id="nb-sim" onclick="goPage('sim')">Simulator</button>
+      <button class="nb" id="nb-reality" onclick="goPage('reality')">Reality Check</button>
+      <button class="nb" id="nb-alert" onclick="goPage('alert')">Alert Engine</button>
+      <button class="nb" id="nb-bias" onclick="goPage('bias')">Bias Detector</button>
+      <button class="nb" id="nb-plans" onclick="goPage('plans')">Plans</button>
+      <button class="nb" id="nb-gloss" onclick="goPage('gloss')">Glossary</button>
+      <button class="nb" id="nb-claim" onclick="goPage('claim')">File Claim</button>
+      <div id="nav-user" style="display:none" class="user-badge"><div class="user-avatar" id="user-avatar">A</div><span id="user-name">Guest</span></div>
+      <button class="nb cta" id="nav-auth-btn" onclick="openAuth()">Sign In</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div class="page active layer" id="page-home">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="badge">✦ Backed by $24M Series A · 2,400+ policyholders protected</div>
+      <h1>Insurance<br><span class="accent">intelligence</span><br>for the modern era.</h1>
+      <p>ClarityShield turns 80 pages of confusing legal jargon into crystal-clear coverage maps, AI-powered bias detection, and confident decisions. Finally — insurance that works for you.</p>
+      <div class="hero-btns">
+        <button class="btn-hero btn-hero-primary" onclick="openAuth()">Get Protected Today →</button>
+        <button class="btn-hero btn-hero-outline" onclick="goPage('quiz')">Take Free Quiz</button>
+      </div>
+    </div>
+    <div class="hero-3d">
+      <div class="card-3d">
+        <div class="card-face">
+          <svg class="shield-3d" viewBox="0 0 80 80" fill="none">
+            <defs><linearGradient id="sg" x1="0" y1="0" x2="80" y2="80"><stop offset="0%" stop-color="#e8829e"/><stop offset="100%" stop-color="#c8b090"/></linearGradient></defs>
+            <path d="M40 8 L70 20 L70 45 C70 60 57 72 40 76 C23 72 10 60 10 45 L10 20 Z" fill="url(#sg)" opacity="0.9"/>
+            <path d="M30 40 L38 48 L52 33" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <h3>Your Coverage Score</h3>
+          <p>AI-powered analysis of your policy completeness and risk exposure across all coverage areas.</p>
+          <div class="coverage-pills">
+            <span class="cpill safe">Home ✓</span>
+            <span class="cpill safe">Auto ✓</span>
+            <span class="cpill risk">Flood ✗</span>
+            <span class="cpill">Life 80%</span>
+            <span class="cpill risk">Business ✗</span>
+          </div>
+          <div class="card-score">
+            <div class="score-num">78</div>
+            <div class="score-label">COVERAGE SCORE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat"><span class="stat-num">$2.4B</span><div class="stat-label">Claims Processed</div></div>
+      <div class="stat"><span class="stat-num">98.7%</span><div class="stat-label">Claim Approval Rate</div></div>
+      <div class="stat"><span class="stat-num">2,400+</span><div class="stat-label">Policies Analyzed</div></div>
+      <div class="stat"><span class="stat-num">4.9★</span><div class="stat-label">Trustpilot Rating</div></div>
+      <div class="stat"><span class="stat-num">24/7</span><div class="stat-label">AI Support</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="wrap">
+      <div class="sec-title">
+        <h2>Everything you need to <span class="g">master your coverage</span></h2>
+        <p>Professional-grade insurance intelligence tools, previously only available to industry insiders</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat-card" onclick="goPage('quiz')">
+          <span class="feat-ico">🧠</span>
+          <h3>Insurance IQ Quiz</h3>
+          <p>10 expert-level questions to reveal your coverage blind spots and teach you what every sophisticated policyholder knows.</p>
+          <div class="feat-arrow">Start assessment →</div>
+        </div>
+        <div class="feat-card" onclick="goPage('viz')">
+          <span class="feat-ico">🗺️</span>
+          <h3>Coverage Visualizer</h3>
+          <p>See your entire policy as a color-coded intelligence map. Green = protected, red = exposed. No reading required.</p>
+          <div class="feat-arrow">View your map →</div>
+        </div>
+        <div class="feat-card" onclick="goPage('sim')">
+          <span class="feat-ico">🎲</span>
+          <h3>Scenario Simulator</h3>
+          <p>"What if my basement floods?" Get instant, precise answers on what your policy actually pays — and what it doesn't.</p>
+          <div class="feat-arrow">Run simulation →</div>
+        </div>
+        <div class="feat-card" onclick="goPage('reality')">
+          <span class="feat-ico">⚖️</span>
+          <h3>Insurance vs Investment Reality Check</h3>
+          <p>The truth about whether your premium is really "just an expense" — with side-by-side financial analysis.</p>
+          <div class="feat-arrow">See the truth →</div>
+        </div>
+        <div class="feat-card" onclick="goPage('alert')">
+          <span class="feat-ico">🚨</span>
+          <h3>Underinsurance Alert Engine</h3>
+          <p>Enter your property details and instantly discover dangerous coverage gaps before they become catastrophic losses.</p>
+          <div class="feat-arrow">Run analysis →</div>
+        </div>
+        <div class="feat-card" onclick="goPage('bias')">
+          <span class="feat-ico">🤖</span>
+          <h3>Agent Bias Detector</h3>
+          <p>Paste any insurance quote or agent recommendation. Our AI flags hidden biases, upsells, and conflict-of-interest red flags.</p>
+          <div class="feat-arrow">Detect bias →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D FLOATING CUBES DECORATION -->
+  <div class="section" style="padding:40px 0;overflow:hidden;position:relative">
+    <div class="wrap" style="display:flex;align-items:center;justify-content:center;gap:60px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <div class="cube-scene"><div class="cube">
+          <div class="cube-face front">🛡️</div><div class="cube-face back">📋</div>
+          <div class="cube-face left">💡</div><div class="cube-face right">⚖️</div>
+          <div class="cube-face top">✦</div><div class="cube-face bottom">✦</div>
+        </div></div>
+        <p style="font-size:12px;color:var(--white3);margin-top:12px;letter-spacing:1px;text-transform:uppercase">Policy Analysis</p>
+      </div>
+      <div style="text-align:center;max-width:420px">
+        <h3 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:12px;color:var(--gold2)">Trusted by families, professionals & businesses</h3>
+        <p style="font-size:14px;color:var(--white3);line-height:1.7">"ClarityShield found ₹47 lakh in uncovered flood risk in our home policy that our agent never disclosed. The underinsurance alert engine is genuinely life-changing." — <strong style="color:var(--white)">Priya M., Mumbai</strong></p>
+      </div>
+      <div style="text-align:center">
+        <div class="cube-scene"><div class="cube" style="animation-delay:-4s;animation-duration:15s">
+          <div class="cube-face front">📊</div><div class="cube-face back">🏠</div>
+          <div class="cube-face left">🚗</div><div class="cube-face right">💊</div>
+          <div class="cube-face top">✦</div><div class="cube-face bottom">✦</div>
+        </div></div>
+        <p style="font-size:12px;color:var(--white3);margin-top:12px;letter-spacing:1px;text-transform:uppercase">Coverage Types</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- INSURANCE FACTS SECTION -->
+  <div style="background:linear-gradient(135deg,rgba(252,232,240,0.5),rgba(240,228,212,0.4));border-top:1px solid rgba(232,130,158,0.2);border-bottom:1px solid rgba(232,130,158,0.2);padding:60px 0">
+    <div class="wrap">
+      <div class="sec-title">
+        <h2>Insurance <span class="g">Facts You Should Know</span></h2>
+        <p>Eye-opening statistics that reveal why smart insurance decisions matter more than ever</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">🏠</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">78%</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">of Indian Homes are Underinsured</div><div style="font-size:13px;color:#6b4858;line-height:1.6">Most home insurance policies are set at purchase and never updated — leaving massive gaps as property values rise over years.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">💸</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">₹47K</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">Average Out-of-Pocket Medical Cost</div><div style="font-size:13px;color:#6b4858;line-height:1.6">Despite health insurance, the average Indian family pays ₹47,000+ out-of-pocket per hospitalization due to sub-limits and hidden exclusions.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">⏰</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">34%</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">of Claims are Delayed or Denied</div><div style="font-size:13px;color:#6b4858;line-height:1.6">1 in 3 insurance claims faces delay or denial — most often due to documentation issues or exclusions the customer didn't know existed.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">🌊</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">96%</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">of Flood Losses are Not Insured</div><div style="font-size:13px;color:#6b4858;line-height:1.6">Flood is excluded from virtually every standard home policy in India, yet millions are affected annually. Only 4% of flood-prone properties carry a flood endorsement.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">📋</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">2 min</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">is All Most People Spend Reading Their Policy</div><div style="font-size:13px;color:#6b4858;line-height:1.6">83% of policyholders never read their full policy document — meaning most people discover exclusions only after a claim is denied.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">📈</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">3.2×</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">More Likely to Claim Than You Think</div><div style="font-size:13px;color:#6b4858;line-height:1.6">The average person will file at least one significant property claim every 10 years — 3.2× more often than most estimate when buying a policy.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">💡</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">50%</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">NCB Discount Available — Rarely Claimed</div><div style="font-size:13px;color:#6b4858;line-height:1.6">Auto policyholders can earn up to 50% No Claim Bonus discount after 5 years, but over 60% of eligible policyholders never apply this at renewal.</div></div>
+        <div style="background:rgba(255,255,255,0.85);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:.3s" onmouseenter="this.style.transform='translateY(-4px)'" onmouseleave="this.style.transform=''"><div style="position:absolute;top:16px;right:16px;font-size:22px;opacity:0.35">🤝</div><div style="font-family:'Playfair Display',serif;font-size:34px;font-weight:900;color:#e8829e;line-height:1;margin-bottom:6px">₹12L</div><div style="font-size:14px;font-weight:700;color:#2a1a24;margin-bottom:7px">Average ULIP Overcharge Over 20 Years</div><div style="font-size:13px;color:#6b4858;line-height:1.6">Customers who buy ULIPs instead of separate term insurance + mutual funds pay an estimated ₹12 lakh more in charges over 20 years, for inferior returns on both fronts.</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- TESTIMONIALS + 3D CUBES -->
+  <div style="padding:56px 0;background:rgba(255,249,245,0.8)">
+    <div class="wrap">
+      <div class="sec-title">
+        <h2>Trusted by <span class="g">families & businesses</span></h2>
+        <p>Real stories from policyholders who discovered the power of insurance clarity</p>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap;margin-bottom:40px">
+        <div style="text-align:center"><div class="cube-scene"><div class="cube"><div class="cube-face front">🛡️</div><div class="cube-face back">📋</div><div class="cube-face left">💡</div><div class="cube-face right">⚖️</div><div class="cube-face top">🌸</div><div class="cube-face bottom">🌸</div></div></div><p style="font-size:11px;color:#a08090;margin-top:11px;letter-spacing:1px;text-transform:uppercase">Policy Analysis</p></div>
+        <div style="text-align:center"><div class="cube-scene"><div class="cube" style="animation-delay:-4s;animation-duration:15s"><div class="cube-face front">📊</div><div class="cube-face back">🏠</div><div class="cube-face left">🚗</div><div class="cube-face right">💊</div><div class="cube-face top">🌸</div><div class="cube-face bottom">🌸</div></div></div><p style="font-size:11px;color:#a08090;margin-top:11px;letter-spacing:1px;text-transform:uppercase">Coverage Types</p></div>
+        <div style="text-align:center"><div class="cube-scene"><div class="cube" style="animation-delay:-2s;animation-duration:18s"><div class="cube-face front">🤖</div><div class="cube-face back">🎲</div><div class="cube-face left">🚨</div><div class="cube-face right">🗺️</div><div class="cube-face top">🌸</div><div class="cube-face bottom">🌸</div></div></div><p style="font-size:11px;color:#a08090;margin-top:11px;letter-spacing:1px;text-transform:uppercase">AI Tools</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+        <div style="background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px"><div style="color:#e8829e;font-size:13px;margin-bottom:10px">★★★★★</div><div style="font-size:14px;color:#6b4858;line-height:1.7;font-style:italic;margin-bottom:14px">"ClarityShield found ₹47 lakh in uncovered flood risk in our home policy that our agent never disclosed. The underinsurance alert engine is genuinely life-changing."</div><div style="display:flex;align-items:center;gap:11px"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(252,232,240,0.8),rgba(240,228,212,0.6));border:1.5px solid rgba(232,130,158,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div><div><div style="font-size:13px;font-weight:700;color:#2a1a24">Priya M.</div><div style="font-size:11px;color:#a08090">Homeowner · Mumbai</div></div></div></div>
+        <div style="background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px"><div style="color:#e8829e;font-size:13px;margin-bottom:10px">★★★★★</div><div style="font-size:14px;color:#6b4858;line-height:1.7;font-style:italic;margin-bottom:14px">"The Bias Detector caught my agent pushing a ULIP that would have cost me ₹8 lakh extra in charges over 15 years. I switched to term + mutual funds immediately."</div><div style="display:flex;align-items:center;gap:11px"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(252,232,240,0.8),rgba(240,228,212,0.6));border:1.5px solid rgba(232,130,158,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">💼</div><div><div style="font-size:13px;font-weight:700;color:#2a1a24">Arjun K.</div><div style="font-size:11px;color:#a08090">Business Owner · Bengaluru</div></div></div></div>
+        <div style="background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:20px;padding:22px"><div style="color:#e8829e;font-size:13px;margin-bottom:10px">★★★★★</div><div style="font-size:14px;color:#6b4858;line-height:1.7;font-style:italic;margin-bottom:14px">"I scored 3/10 on the quiz — turns out my home business equipment was completely uninsured. Fixed it within a week thanks to the Coverage Map. Could not recommend more."</div><div style="display:flex;align-items:center;gap:11px"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(252,232,240,0.8),rgba(240,228,212,0.6));border:1.5px solid rgba(232,130,158,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">💻</div><div><div style="font-size:13px;font-weight:700;color:#2a1a24">Sneha R.</div><div style="font-size:11px;color:#a08090">Freelance Designer · Delhi</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-links">
+      <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Regulatory Compliance</a>
+      <a href="#">IRDAI Registered</a><a href="#">Contact Us</a>
+    </div>
+    <p>© 2024 ClarityShield Insurance Intelligence Platform · IRDAI Registration No. CL-2024-001 · All rights reserved</p>
+  </footer>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page layer" id="page-quiz">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Insurance <span class="g">Awareness Quiz</span></h2>
+      <p>10 expert questions to reveal your coverage blind spots</p>
+    </div>
+    <div class="quiz-wrap" id="quizWrap"></div>
+  </div>
+</div>
+
+<!-- COVERAGE MAP PAGE -->
+<div class="page layer" id="page-viz">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Coverage <span class="g">Intelligence Map</span></h2>
+      <p>Click any area to see full details, limits, and exclusions</p>
+    </div>
+    <div class="wrap">
+      <div class="viz-tabs" id="vizTabs"></div>
+      <div id="vizMain" style="background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:26px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULATOR PAGE -->
+<div class="page layer" id="page-sim">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Scenario <span class="g">Simulator</span></h2>
+      <p>Pick a real-life scenario and instantly see what your policy covers</p>
+    </div>
+    <div class="wrap" style="max-width:760px;margin:0 auto">
+      <div id="simCard" style="background:rgba(255,255,255,0.9);border:1.5px solid rgba(232,130,158,0.2);border-radius:var(--rad);padding:30px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INSURANCE vs INVESTMENT REALITY CHECK -->
+<div class="page layer" id="page-reality">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Insurance vs Investment <span class="g">Reality Check</span></h2>
+      <p>The honest truth about where insurance fits in your financial picture</p>
+    </div>
+    <div class="wrap">
+      <div class="reality-wrap">
+        <div class="reality-card insurance-col">
+          <div class="reality-head">
+            <div class="reality-ico ri-ins">🛡️</div>
+            <h3 style="color:var(--gold2)">Insurance</h3>
+          </div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Protection against catastrophic loss.</strong> A single event (fire, accident, illness) can wipe out decades of savings. Insurance caps your downside.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Forced financial discipline.</strong> Regular premium payments create a system for risk management that most people wouldn't maintain alone.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Tax advantages.</strong> Health, life, and some business insurance premiums qualify for tax deductions under Sections 80C, 80D.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--gold)">~</span><span class="reality-text"><strong style="color:var(--white)">Negative expected return — by design.</strong> You pay more in premiums than you expect to receive (statistically). That's the point — it's not an investment.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--rose)">✗</span><span class="reality-text"><strong style="color:var(--white)">ULIP & endowment plans</strong> mix insurance with investment, often delivering poor returns on both. Avoid these hybrid products.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--rose)">✗</span><span class="reality-text"><strong style="color:var(--white)">Over-insurance is waste.</strong> Buying more coverage than your actual risk exposure means spending premium for no benefit.</span></div>
+        </div>
+        <div class="reality-card invest-col">
+          <div class="reality-head">
+            <div class="reality-ico ri-inv">📈</div>
+            <h3 style="color:var(--teal2)">Investment</h3>
+          </div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Positive expected return.</strong> Stocks, mutual funds, and real estate generate wealth over time. Insurance doesn't. They serve fundamentally different purposes.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Compounding effect.</strong> ₹10,000/month invested at 12% CAGR becomes ₹1 Crore+ in 20 years. Premium payments don't compound.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--teal)">✓</span><span class="reality-text"><strong style="color:var(--white)">Liquidity options.</strong> Most investments (mutual funds, stocks) can be liquidated. Insurance payouts only come in defined claim scenarios.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--gold)">~</span><span class="reality-text"><strong style="color:var(--white)">Investment cannot replace insurance.</strong> ₹50 lakh in savings sounds like a lot until a ₹80 lakh medical bill or home fire arrives.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--rose)">✗</span><span class="reality-text"><strong style="color:var(--white)">Market risk.</strong> Investments can lose value at the worst time — exactly when a crisis hits and you might also need to file a claim.</span></div>
+          <div class="reality-row"><span class="reality-check" style="color:var(--rose)">✗</span><span class="reality-text"><strong style="color:var(--white)">No liability protection.</strong> Investments don't protect you from lawsuits, legal costs, or third-party damage claims. Insurance does.</span></div>
+        </div>
+      </div>
+      <div class="verdict-bar">
+        <h3>⚖️ The ClarityShield Verdict</h3>
+        <p>Insurance and investment are not competitors — they're complements. The optimal strategy: buy <strong style="color:var(--gold2)">pure term life insurance</strong> + <strong style="color:var(--gold2)">comprehensive home/health coverage</strong>, then invest the premium savings from avoiding ULIPs into low-cost index funds. Pure insurance + pure investment beats hybrid products in 94% of scenarios over a 20-year horizon.</p>
+      </div>
+
+      <!-- COMPARISON CALCULATOR -->
+      <div style="margin-top:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--rad);padding:32px">
+        <h3 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold2);margin-bottom:24px">📊 Side-by-Side Financial Calculator</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Monthly Premium (₹)</label><input type="number" id="rc-premium" value="15000" oninput="calcReality()"></div>
+          <div class="form-field"><label>Investment Return (% p.a.)</label><input type="number" id="rc-return" value="12" oninput="calcReality()"></div>
+          <div class="form-field"><label>Coverage Amount (₹ Lakh)</label><input type="number" id="rc-cover" value="50" oninput="calcReality()"></div>
+          <div class="form-field"><label>Time Horizon (Years)</label><input type="number" id="rc-years" value="20" oninput="calcReality()"></div>
+        </div>
+        <div id="reality-calc-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UNDERINSURANCE ALERT ENGINE -->
+<div class="page layer" id="page-alert">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Underinsurance <span class="g">Alert Engine</span></h2>
+      <p>Discover dangerous coverage gaps before they become catastrophic losses</p>
+    </div>
+    <div class="wrap" style="max-width:840px;margin:0 auto">
+      <div class="alert-form">
+        <h3>📋 Enter Your Property & Coverage Details</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Property Type</label>
+            <select id="al-type"><option>Owned Home</option><option>Rented Home</option><option>Commercial</option><option>Vehicle</option></select></div>
+          <div class="form-field"><label>Property Value (₹ Lakh)</label><input type="number" id="al-value" value="80" placeholder="80"></div>
+          <div class="form-field"><label>Current Coverage (₹ Lakh)</label><input type="number" id="al-cover" value="40" placeholder="40"></div>
+          <div class="form-field"><label>Monthly Premium (₹)</label><input type="number" id="al-premium" value="3500" placeholder="3500"></div>
+          <div class="form-field"><label>Deductible (₹)</label><input type="number" id="al-deduct" value="25000" placeholder="25000"></div>
+          <div class="form-field"><label>Location Risk</label>
+            <select id="al-risk"><option>Low (inland, stable)</option><option>Medium (urban area)</option><option>High (coastal/flood zone)</option></select></div>
+          <div class="form-field"><label>Last Policy Review</label>
+            <select id="al-review"><option>Less than 1 year</option><option>1-3 years ago</option><option>3-5 years ago</option><option>Never reviewed</option></select></div>
+          <div class="form-field"><label>Contents Value (₹ Lakh)</label><input type="number" id="al-contents" value="15" placeholder="15"></div>
+        </div>
+        <button class="btn-analyze" onclick="runAlertEngine()">🔍 Analyze My Coverage Gaps</button>
+      </div>
+      <div class="alert-results" id="alertResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BIAS DETECTOR PAGE -->
+<div class="page layer" id="page-bias">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Agent Bias <span class="g">Detector</span></h2>
+      <p>Paste any insurance quote or recommendation — our AI reveals hidden biases and red flags</p>
+    </div>
+    <div class="wrap bias-wrap">
+      <div class="bias-input">
+        <h3>Paste your insurance quote, agent recommendation, or policy excerpt:</h3>
+        <div class="bias-presets" style="margin-top:16px">
+          <span style="font-size:12px;color:var(--white3);align-self:center;margin-right:4px">Try a sample:</span>
+          <button class="preset-btn" onclick="loadPreset(0)">Upsell example</button>
+          <button class="preset-btn" onclick="loadPreset(1)">Fair quote</button>
+          <button class="preset-btn" onclick="loadPreset(2)">High-bias agent</button>
+          <button class="preset-btn" onclick="loadPreset(3)">ULIP push</button>
+        </div>
+        <textarea class="bias-textarea" id="biasText" placeholder="Paste insurance quote, agent email, or recommendation text here…"></textarea>
+        <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn-analyze" onclick="runBiasDetector()">🤖 Analyze for Bias</button>
+          <button style="padding:14px 24px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--white3);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer" onclick="document.getElementById('biasText').value='';document.getElementById('biasResults').classList.remove('show')">Clear</button>
+        </div>
+      </div>
+      <div class="bias-results" id="biasResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANS PAGE -->
+<div class="page layer" id="page-plans">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Choose Your <span class="g">Protection Plan</span></h2>
+      <p>Institutional-grade coverage, transparent pricing, zero surprises</p>
+    </div>
+    <div class="wrap"><div class="plans-grid" id="plansGrid"></div></div>
+  </div>
+</div>
+
+<!-- GLOSSARY PAGE -->
+<div class="page layer" id="page-gloss">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>Insurance <span class="g">Glossary</span></h2>
+      <p>Every term your insurer uses — explained in plain English</p>
+    </div>
+    <div class="wrap">
+      <input class="gloss-search" placeholder="Search terms… e.g. deductible, premium, subrogation" oninput="filterGloss(this.value)">
+      <div class="gloss-grid" id="glossGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLAIM GUIDE PAGE -->
+<div class="page layer" id="page-claim">
+  <div class="section">
+    <div class="wrap sec-title">
+      <h2>How to <span class="g">File a Claim</span></h2>
+      <p>Follow these steps to get paid quickly and avoid costly mistakes</p>
+    </div>
+    <div class="wrap" style="max-width:680px;margin:0 auto">
+      <div id="claimFlow"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── 3D BACKGROUND CANVAS ───
+const canvas = document.getElementById('bg3d');
+const ctx = canvas.getContext('2d');
+let particles = [], W, H;
+function resizeCanvas(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+class Particle {
+  constructor(){ this.reset(); }
+  reset(){
+    this.x=Math.random()*W; this.y=Math.random()*H;
+    this.z=Math.random()*1000;
+    this.r=Math.random()*1.5+0.3;
+    this.speed=Math.random()*0.4+0.1;
+    const t=Math.random();this.color=t<0.45?`rgba(232,130,158,${Math.random()*0.3+0.06})`:t<0.75?`rgba(240,228,212,${Math.random()*0.5+0.15})`:`rgba(200,150,120,${Math.random()*0.25+0.04})`;
+  }
+  update(){ this.z-=this.speed; if(this.z<1){this.reset();this.z=1000;} }
+  draw(){
+    const px=(this.x-W/2)*(1000/this.z)+W/2;
+    const py=(this.y-H/2)*(1000/this.z)+H/2;
+    const size=this.r*(1000/this.z);
+    if(px<-10||px>W+10||py<-10||py>H+10)return;
+    ctx.beginPath(); ctx.arc(px,py,size,0,Math.PI*2);
+    ctx.fillStyle=this.color; ctx.fill();
+  }
+}
+for(let i=0;i<180;i++) particles.push(new Particle());
+function animBg(){
+  ctx.clearRect(0,0,W,H);
+  // subtle grid
+  ctx.strokeStyle='rgba(232,130,158,0.04)';
+  ctx.lineWidth=1;
+  for(let x=0;x<W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(animBg);
+}
+animBg();
+
+// ─── AUTH ───
+let currentUser = null;
+function openAuth(){ document.getElementById('authModal').classList.add('open'); }
+function closeAuth(){ document.getElementById('authModal').classList.remove('open'); }
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
+function switchAuthTab(t){
+  document.getElementById('auth-login').style.display=t==='login'?'block':'none';
+  document.getElementById('auth-register').style.display=t==='register'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('active',t==='login');
+  document.getElementById('tab-register').classList.toggle('active',t==='register');
+}
+function doLogin(){
+  const email=document.getElementById('login-email').value;
+  if(!email){showToast('Please enter your email address');return;}
+  loginAs(email.split('@')[0],'user');
+}
+function doRegister(){
+  const name=document.getElementById('reg-name').value;
+  const email=document.getElementById('reg-email').value;
+  if(!name||!email){showToast('Please fill in all fields');return;}
+  loginAs(name,'user');
+}
+function socialLogin(provider){
+  loginAs('Social User','user');
+  showToast(`Signed in with ${provider}`);
+}
+function guestLogin(){
+  loginAs('Guest','guest');
+  document.getElementById('guestBanner').style.display='flex';
+}
+function loginAs(name,role){
+  currentUser={name,role};
+  closeAuth();
+  document.getElementById('nav-auth-btn').style.display='none';
+  document.getElementById('nav-user').style.display='flex';
+  document.getElementById('user-name').textContent=name;
+  document.getElementById('user-avatar').textContent=name[0].toUpperCase();
+  showToast(role==='guest'?`Welcome, ${name}! (Limited access)`:`Welcome back, ${name}! 🛡️`);
+}
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ─── PAGE ROUTING ───
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nb[id^="nb-"]').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('nb-'+name); if(nb)nb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='quiz'&&!quizInited){renderQuiz();quizInited=true;}
+  if(name==='viz')renderViz();
+  if(name==='sim')renderSim();
+  if(name==='plans')renderPlans();
+  if(name==='gloss')renderGloss();
+  if(name==='claim')renderClaim();
+  if(name==='reality')calcReality();
+}
+
+// ─── QUIZ ───
+const quizData=[
+  {q:"What is a 'deductible' in your insurance policy?",hint:"This is the amount YOU pay before your insurer pays anything.",opts:[{t:"The monthly cost of your policy",i:"💳"},{t:"The amount you pay before insurance kicks in",i:"✅"},{t:"The maximum your insurer will pay",i:"📈"},{t:"A penalty for filing too many claims",i:"⚠️"}],ans:1,explain:"A deductible is your out-of-pocket cost before your insurer pays. Higher deductible = lower premium, but more risk if you claim."},
+  {q:"Which event is typically NOT covered by standard home insurance?",hint:"One of these requires a separate policy.",opts:[{t:"Kitchen fire caused by cooking",i:"🔥"},{t:"Theft of electronics from your home",i:"📱"},{t:"Flood damage from a nearby river",i:"🌊"},{t:"Windstorm damage to your roof",i:"💨"}],ans:2,explain:"Flood damage is almost universally excluded from standard home policies. You need a separate flood insurance policy."},
+  {q:"What does 'liability coverage' protect you from?",hint:"Think about what happens if someone gets hurt at your property.",opts:[{t:"Damage to your own belongings",i:"📦"},{t:"Medical bills for your own family",i:"🏥"},{t:"Legal costs if someone sues you for injuries",i:"⚖️"},{t:"Theft of your car",i:"🚗"}],ans:2,explain:"Liability coverage pays for legal defense and damages if someone is injured on your property and sues you."},
+  {q:"What is 'actual cash value' (ACV)?",hint:"How your insurer values your old sofa that was damaged.",opts:[{t:"The original price you paid for an item",i:"🏷️"},{t:"The cost to buy a brand-new replacement",i:"🆕"},{t:"The original price minus depreciation",i:"📉"},{t:"The market value of your entire home",i:"🏠"}],ans:2,explain:"ACV means you get paid what the item is worth TODAY, not what you paid. A 5-year-old TV bought for ₹50K might only get ₹15K at ACV."},
+  {q:"If you run a business from home, are your business tools covered?",hint:"Most home policies have specific language about this.",opts:[{t:"Yes, everything in your home is covered",i:"✅"},{t:"Only if they cost less than ₹50,000",i:"💰"},{t:"No — home business equipment is typically excluded",i:"🚫"},{t:"Yes, but only if you tell your insurer",i:"📞"}],ans:2,explain:"Home-based business equipment is almost always excluded from personal home insurance. You need a separate business endorsement."},
+  {q:"What is 'replacement cost coverage'?",hint:"This is the better (and more expensive) alternative to ACV.",opts:[{t:"Cost to repair your item after a deductible",i:"🔧"},{t:"Full cost to replace with a brand-new equivalent item",i:"🆕"},{t:"Half the original purchase price",i:"50%"},{t:"Coverage for temporary accommodation",i:"🏨"}],ans:1,explain:"Replacement cost pays you enough to buy a brand-new equivalent item without deducting for depreciation."},
+  {q:"What is an insurance 'exclusion'?",hint:"This is the fine print that determines what you DON'T get.",opts:[{t:"A discount on your premium",i:"💸"},{t:"An item specifically removed from your coverage",i:"🚫"},{t:"Extra coverage you can add on",i:"➕"},{t:"The grace period before your policy starts",i:"⏳"}],ans:1,explain:"Exclusions are specific events your policy WON'T cover. Reading exclusions carefully is the most important thing a policyholder can do."},
+  {q:"What is 'subrogation' in insurance?",hint:"What happens when your insurer goes after the person who caused your damage.",opts:[{t:"Cancelling a policy early without penalty",i:"❌"},{t:"Your insurer's right to sue the at-fault party after paying you",i:"⚖️"},{t:"Adding a family member to your policy",i:"👨‍👩‍👧"},{t:"The process of renewing your policy annually",i:"🔄"}],ans:1,explain:"After your insurer pays your claim, they can pursue the at-fault party for reimbursement."},
+  {q:"What best describes 'umbrella insurance'?",hint:"Think of it as a safety net on top of your other policies.",opts:[{t:"Insurance for expensive umbrellas and accessories",i:"☂️"},{t:"A policy that only covers weather-related damage",i:"🌧️"},{t:"Extra liability coverage beyond your regular policy limits",i:"🛡️"},{t:"Coverage for international travel",i:"✈️"}],ans:2,explain:"Umbrella insurance gives you extra liability protection — typically ₹1Cr+ — that kicks in when your regular limits are exhausted."},
+  {q:"How does the 'grace period' in insurance work?",hint:"Useful to know when your payment is late.",opts:[{t:"The time before your new policy takes effect",i:"⏳"},{t:"A window after your due date before your policy is cancelled",i:"📅"},{t:"A period where you can claim without a deductible",i:"🎁"},{t:"The time you have to dispute a claim settlement",i:"⚖️"}],ans:1,explain:"A grace period (typically 15-30 days) gives you time to pay without losing your coverage. Always check your specific policy terms."}
+];
+let quizState={curr:0,answers:[],done:false}, quizInited=false;
+function renderQuiz(){
+  const w=document.getElementById('quizWrap');
+  if(quizState.done){renderResult();return;}
+  const q=quizData[quizState.curr];
+  const prog=quizData.map((_,i)=>`<div class="qp ${i<quizState.curr?'done':i===quizState.curr?'active':''}"></div>`).join('');
+  const opts=q.opts.map((o,i)=>`<button class="quiz-opt ${quizState.answers[quizState.curr]===i?'selected':''}" onclick="selectOpt(${i})">${o.i?`<span style="font-size:18px">${o.i}</span>`:''}${o.t}</button>`).join('');
+  w.innerHTML=`<div class="quiz-progress">${prog}</div>
+  <div class="quiz-card">
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-hint">💡 ${q.hint}</div>
+    <div class="quiz-opts">${opts}</div>
+    <div class="quiz-nav">
+      <span class="q-count">Question ${quizState.curr+1} of ${quizData.length}</span>
+      <div style="display:flex;gap:8px">
+        ${quizState.curr>0?'<button class="btn-qnav" onclick="prevQ()">← Back</button>':''}
+        ${quizState.answers[quizState.curr]!==undefined?`<button class="btn-qnav cta-q" onclick="nextQ()">${quizState.curr===quizData.length-1?'See Results →':'Next →'}</button>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+function selectOpt(i){quizState.answers[quizState.curr]=i;renderQuiz();}
+function nextQ(){if(quizState.curr===quizData.length-1){quizState.done=true;renderResult();}else{quizState.curr++;renderQuiz();}}
+function prevQ(){if(quizState.curr>0){quizState.curr--;renderQuiz();}}
+function renderResult(){
+  const w=document.getElementById('quizWrap');
+  const score=quizState.answers.filter((a,i)=>a===quizData[i].ans).length;
+  const pct=Math.round(score/quizData.length*100);
+  let grade,col,msg;
+  if(pct>=80){grade='Insurance Pro 🏆';col='var(--teal2)';msg='Impressive knowledge. A few areas to sharpen below.';}
+  else if(pct>=60){grade='Getting There ⬆️';col='var(--gold2)';msg='Solid foundation but important gaps. Review below.';}
+  else{grade='Coverage Novice 📚';col='var(--rose2)';msg='Don\'t worry — most people fail this quiz. Read the insights below.';}
+  const wrongs=quizData.filter((_,i)=>quizState.answers[i]!==quizData[i].ans);
+  const tips=wrongs.slice(0,5).map(q=>`<div class="tip-item"><span style="font-size:16px">💡</span><div><strong style="color:var(--white)">${q.q.slice(0,55)}…</strong><br>${q.explain}</div></div>`).join('');
+  w.innerHTML=`<div class="result-card">
+    <div style="font-size:40px">🎯</div>
+    <div class="result-score">${score}/${quizData.length}</div>
+    <div class="result-label" style="color:${col}">${grade} — ${pct}%</div>
+    <p style="font-size:14px;color:var(--white3);line-height:1.7;max-width:480px;margin:0 auto">${msg}</p>
+    ${wrongs.length?`<div class="result-tips"><div style="font-size:14px;font-weight:600;margin-bottom:14px;text-align:left;color:var(--gold2)">Key insights to remember:</div>${tips}</div>`:'<p style="margin-top:20px;color:var(--teal2);font-weight:700;font-size:16px">Perfect score! You\'re fully coverage-aware. 🏆</p>'}
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap">
+      <button class="btn-hero btn-hero-primary" onclick="quizState={curr:0,answers:[],done:false};renderQuiz()">Retake Quiz</button>
+      <button class="btn-hero btn-hero-outline" onclick="goPage('viz')">See Coverage Map →</button>
+    </div>
+  </div>`;
+}
+
+// ─── COVERAGE MAP ───
+const vizPolicies=[
+  {name:'Home Insurance',icon:'🏠',areas:[
+    {name:'Structural damage',pct:92,color:'green',ico:'🧱',details:[['Fire & smoke','Up to ₹50L'],['Windstorm/hail','Up to ₹50L'],['Vandalism','Up to ₹5L'],['Flood','EXCLUDED'],['Earthquake','EXCLUDED']]},
+    {name:'Theft & burglary',pct:78,color:'green',ico:'🔒',details:[['Electronics','₹5L limit'],['Jewelry','₹2.5L limit'],['Cash','₹20K limit'],['Bicycles','₹1L limit'],['Art & collectibles','₹50K limit']]},
+    {name:'Flood damage',pct:0,color:'red',ico:'🌊',details:[['Surface flooding','EXCLUDED'],['Basement flooding','EXCLUDED'],['Sewer backup','EXCLUDED'],['Storm surge','EXCLUDED'],['Overflow from drains','EXCLUDED']]},
+    {name:'Accidental damage',pct:45,color:'amber',ico:'💥',details:[['Accidental breakage','Limited cover'],['DIY gone wrong','NOT covered'],['Pet damage','EXCLUDED'],['Water damage from pipes','Covered'],['Appliance damage','Partial only']]},
+    {name:'Personal liability',pct:90,color:'green',ico:'⚖️',details:[['Guest injury','Up to ₹30L'],['Dog bite','Up to ₹30L'],['Legal defense','Included'],['Intentional acts','EXCLUDED'],['Business liability','EXCLUDED']]},
+    {name:'Additional living',pct:85,color:'green',ico:'🏨',details:[['Hotel stay','30 days max'],['Meals allowance','₹5K/day'],['Storage costs','Included'],['Pet boarding','₹50K max'],['Car rental','NOT included']]},
+  ]},
+  {name:'Auto Insurance',icon:'🚗',areas:[
+    {name:'Collision',pct:88,color:'green',ico:'💢',details:[['At-fault accident','After deductible'],['Hit & run','Covered'],['Single car accident','Covered'],['Racing damage','EXCLUDED'],['Flood','EXCLUDED']]},
+    {name:'Comprehensive',pct:82,color:'green',ico:'🛡️',details:[['Theft','Full IDV'],['Hail damage','Covered'],['Animal collision','Covered'],['Fire','Covered'],['Mechanical breakdown','EXCLUDED']]},
+    {name:'Third-party liability',pct:95,color:'green',ico:'⚖️',details:[['Bodily injury to others','Up to ₹15L/person'],['Property damage','Up to ₹7.5L'],['Legal costs','Included'],['Punitive damages','EXCLUDED'],['Intentional acts','EXCLUDED']]},
+    {name:'Personal injury',pct:70,color:'amber',ico:'🏥',details:[['Medical bills','Up to ₹1L'],['Lost wages','Up to ₹50K'],['Rehabilitation','Partial'],['Long-term disability','NOT covered'],['Mental health','Limited']]},
+    {name:'Uninsured motorist',pct:75,color:'amber',ico:'🚦',details:[['Uninsured driver hits you','Covered'],['Hit & run','Covered'],['Underinsured driver','Partial'],['Out-of-state coverage','Check policy'],['Pedestrian accident','Limited']]},
+    {name:'Roadside assist',pct:60,color:'amber',ico:'🔧',details:[['Towing','Up to ₹5K'],['Battery jump','Included'],['Lockout service','Included'],['Fuel delivery','1x/year'],['Flat tire','Included']]},
+  ]},
+  {name:'Health Insurance',icon:'💊',areas:[
+    {name:'Hospitalization',pct:90,color:'green',ico:'🏥',details:[['In-network hospital','After deductible'],['Surgery','Covered'],['ICU/emergency','Covered'],['Out-of-network','Higher cost'],['Cosmetic surgery','EXCLUDED']]},
+    {name:'Prescriptions',pct:75,color:'green',ico:'💊',details:[['Generic drugs','Lowest copay'],['Brand name','Higher copay'],['Specialty drugs','Prior auth needed'],['Experimental drugs','EXCLUDED'],['OTC medications','NOT covered']]},
+    {name:'Mental health',pct:65,color:'amber',ico:'🧠',details:[['Therapy (in-network)','Covered'],['Psychiatry','Covered'],['Residential treatment','Limited'],['Substance abuse','Covered'],['Couples counseling','Often excluded']]},
+    {name:'Dental',pct:50,color:'amber',ico:'🦷',details:[['Cleanings (2x/year)','100% covered'],['Fillings','80% covered'],['Root canal','50% covered'],['Orthodontics','Often excluded'],['Cosmetic dentistry','EXCLUDED']]},
+    {name:'Vision',pct:40,color:'amber',ico:'👁️',details:[['Annual eye exam','1x/year covered'],['Glasses frames','₹5K allowance'],['Contact lenses','₹4K allowance'],['LASIK','NOT covered'],['Medically necessary','May be covered']]},
+    {name:'Alternative care',pct:20,color:'red',ico:'🌿',details:[['Ayurveda / AYUSH','Varies by plan'],['Homeopathy','Usually excluded'],['Chiropractic','Very limited'],['Massage therapy','NOT covered'],['Naturopathy','NOT covered']]},
+  ]}
+];
+let vizActive={policy:0,area:null};
+function renderViz(){
+  const tabs=document.getElementById('vizTabs');
+  const main=document.getElementById('vizMain');
+  tabs.innerHTML=vizPolicies.map((p,i)=>`<button class="viz-tab ${i===vizActive.policy?'active':''}" onclick="switchVizPolicy(${i})">${p.icon} ${p.name}</button>`).join('');
+  const pol=vizPolicies[vizActive.policy];
+  const cells=pol.areas.map((a,i)=>`<div class="cov-cell ${a.color}" onclick="toggleVizDetail(${i})">
+    <div class="cov-ico">${a.ico}</div><div class="cov-name">${a.name}</div>
+    <div class="cov-pct">${a.pct}%</div>
+    <div class="cov-bar-wrap"><div class="cov-bar-fill" style="width:0%" id="cf-${i}"></div></div>
+  </div>`).join('');
+  const legend=`<div class="viz-legend"><div class="leg"><div class="leg-dot" style="background:var(--teal)"></div>Well covered</div><div class="leg"><div class="leg-dot" style="background:var(--gold)"></div>Partial</div><div class="leg"><div class="leg-dot" style="background:var(--rose)"></div>Not covered</div></div>`;
+  main.innerHTML=`<div class="coverage-map">${cells}</div><div id="covDetail"></div>${legend}`;
+  setTimeout(()=>pol.areas.forEach((_,i)=>{const el=document.getElementById('cf-'+i);if(el)el.style.width=pol.areas[i].pct+'%';}),80);
+}
+function switchVizPolicy(i){vizActive={policy:i,area:null};renderViz();}
+function toggleVizDetail(i){
+  vizActive.area=vizActive.area===i?null:i;
+  const det=document.getElementById('covDetail');
+  if(vizActive.area===null){det.innerHTML='';return;}
+  const a=vizPolicies[vizActive.policy].areas[i];
+  det.innerHTML=`<div class="cov-detail"><h4>${a.ico} ${a.name} — Coverage Details</h4>${a.details.map(r=>`<div class="cov-dr"><span>${r[0]}</span><strong>${r[1]}</strong></div>`).join('')}</div>`;
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ─── SIMULATOR ───
+const scenarios=[
+  {emoji:'🌊',label:'Basement floods',verdict:'Not Covered',col:'var(--rose)',total:'₹0 covered',rows:[
+    {t:'not-covered',l:'Structural water damage',a:'EXCLUDED'},{t:'not-covered',l:'Furniture & belongings',a:'EXCLUDED'},
+    {t:'not-covered',l:'Mold from flooding',a:'EXCLUDED'},{t:'partial',l:'Emergency pump-out service',a:'May qualify'},{t:'not-covered',l:'Temporary accommodation',a:'Not applicable'}]},
+  {emoji:'🔥',label:'Kitchen fire',verdict:'Covered',col:'var(--teal)',total:'Up to ₹24.5L covered',rows:[
+    {t:'covered',l:'Structural repair to kitchen',a:'Up to ₹18L'},{t:'covered',l:'Contents & appliances',a:'Up to ₹2.5L'},
+    {t:'covered',l:'Smoke damage throughout home',a:'Up to ₹4L'},{t:'covered',l:'Hotel stay (30 days)',a:'Covered'},{t:'partial',l:'Jewelry & valuables',a:'₹2.5L cap'}]},
+  {emoji:'🚗',label:'Car hits house',verdict:'Covered',col:'var(--teal)',total:'Up to ₹50L covered',rows:[
+    {t:'covered',l:'Structural wall/garage damage',a:'Up to ₹50L'},{t:'covered',l:'Interior damage from impact',a:'Covered'},
+    {t:'covered',l:'Emergency boarding/securing',a:'Covered'},{t:'covered',l:'Liability if driver injured',a:'Up to ₹30L'},{t:'partial',l:'Landscaping damage',a:'₹50K limit only'}]},
+  {emoji:'🦠',label:'Mold found',verdict:'Partial',col:'var(--gold)',total:'Up to ₹1.05L possible',rows:[
+    {t:'covered',l:'Mold from covered pipe burst',a:'Up to ₹1L'},{t:'partial',l:'Air quality testing',a:'₹5K limit'},
+    {t:'not-covered',l:'Pre-existing mold',a:'EXCLUDED'},{t:'not-covered',l:'Mold from humidity',a:'EXCLUDED'},{t:'not-covered',l:'Mold inside HVAC',a:'EXCLUDED'}]},
+  {emoji:'💨',label:'Storm roof damage',verdict:'Covered',col:'var(--teal)',total:'Up to ₹50.2L covered',rows:[
+    {t:'covered',l:'Roof structural repair',a:'Up to ₹50L'},{t:'covered',l:'Interior water damage',a:'Covered'},
+    {t:'covered',l:'Emergency tarping',a:'Covered'},{t:'covered',l:'Fallen tree removal',a:'Up to ₹10K/tree'},{t:'partial',l:'Solar panels/skylights',a:'Sub-limit applies'}]},
+  {emoji:'💎',label:'Jewelry stolen',verdict:'Partial',col:'var(--gold)',total:'Up to ₹2.5L covered',rows:[
+    {t:'partial',l:'Engagement ring/wedding band',a:'₹2.5L limit'},{t:'partial',l:'Other jewelry',a:'Within ₹2.5L total'},
+    {t:'covered',l:'Electronics stolen same time',a:'Up to ₹5L'},{t:'not-covered',l:'Jewelry above policy limit',a:'Need a rider'},{t:'covered',l:'Police report required',a:'Yes — file one'}]}
+];
+let activeScen=0;
+function renderSim(){
+  const btns=scenarios.map((s,i)=>`<button class="scen-btn ${i===activeScen?'active':''}" onclick="pickScen(${i})">${s.emoji} ${s.label}</button>`).join('');
+  const sc=scenarios[activeScen];
+  const rows=sc.rows.map(r=>`<div class="sim-row ${r.t}"><div class="sim-dot"></div><span>${r.l}</span><span class="sim-amt">${r.a}</span></div>`).join('');
+  document.getElementById('simCard').innerHTML=`
+    <div style="font-size:17px;font-weight:700;color:var(--gold2);margin-bottom:4px;font-family:'Playfair Display',serif">What happens if…</div>
+    <div style="font-size:13px;color:var(--white3);margin-bottom:20px">Select a real-life scenario to see how your home policy responds</div>
+    <div class="sim-scenarios">${btns}</div>
+    <div class="sim-result">
+      <div class="sim-header" style="background:${sc.col}">${sc.emoji} ${sc.label}<span style="font-size:12px;background:rgba(255,255,255,0.2);padding:3px 12px;border-radius:50px">${sc.verdict}</span></div>
+      <div class="sim-body">${rows}</div>
+    </div>
+    <div class="sim-total"><span>Estimated coverage</span><span>${sc.total}</span></div>`;
+}
+function pickScen(i){activeScen=i;renderSim();}
+
+// ─── REALITY CHECK CALCULATOR ───
+function calcReality(){
+  const prem=parseFloat(document.getElementById('rc-premium')?.value)||15000;
+  const ret=parseFloat(document.getElementById('rc-return')?.value)||12;
+  const cover=(parseFloat(document.getElementById('rc-cover')?.value)||50)*100000;
+  const yrs=parseFloat(document.getElementById('rc-years')?.value)||20;
+  const totalPaid=prem*12*yrs;
+  const investValue=prem*12*((Math.pow(1+ret/100,yrs)-1)/(ret/100))*(1+ret/100);
+  const coverageRatio=(cover/totalPaid).toFixed(1);
+  const div=document.getElementById('reality-calc-result');
+  if(!div)return;
+  div.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:8px">
+    <div style="background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:var(--rad2);padding:20px;text-align:center">
+      <div style="font-size:11px;color:var(--white3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Total Premiums Paid</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--gold2)">₹${(totalPaid/100000).toFixed(1)}L</div>
+      <div style="font-size:12px;color:var(--white3);margin-top:4px">over ${yrs} years</div>
+    </div>
+    <div style="background:rgba(26,191,191,0.08);border:1px solid rgba(26,191,191,0.25);border-radius:var(--rad2);padding:20px;text-align:center">
+      <div style="font-size:11px;color:var(--white3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">If Invested Instead</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--teal2)">₹${(investValue/100000).toFixed(1)}L</div>
+      <div style="font-size:12px;color:var(--white3);margin-top:4px">at ${ret}% CAGR</div>
+    </div>
+    <div style="background:rgba(232,93,138,0.08);border:1px solid rgba(232,93,138,0.25);border-radius:var(--rad2);padding:20px;text-align:center">
+      <div style="font-size:11px;color:var(--white3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Coverage Protection</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--rose2)">₹${(cover/100000).toFixed(0)}L</div>
+      <div style="font-size:12px;color:var(--white3);margin-top:4px">${coverageRatio}× leverage on your premium</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--rad2);padding:20px;text-align:center">
+      <div style="font-size:11px;color:var(--white3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Gap Without Insurance</div>
+      <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--white)">₹${Math.max(0,(cover-investValue)/100000).toFixed(1)}L</div>
+      <div style="font-size:12px;color:var(--white3);margin-top:4px">potential shortfall in year 1</div>
+    </div>
+  </div>
+  <div style="margin-top:16px;padding:16px;background:rgba(201,168,76,0.08);border-radius:var(--rad3);font-size:13px;color:var(--white3);line-height:1.7">
+    ⚖️ <strong style="color:var(--gold2)">Verdict:</strong> If a ₹${(cover/100000).toFixed(0)}L loss happened in year 1, insurance would cover it entirely. Your investments would only have ₹${(prem*12/100000).toFixed(2)}L. Insurance isn't competing with investment — it's <em style="color:var(--white)">buying time for your investments to grow</em>.
+  </div>`;
+}
+
+// ─── UNDERINSURANCE ALERT ENGINE ───
+function runAlertEngine(){
+  const value=parseFloat(document.getElementById('al-value').value)||80;
+  const cover=parseFloat(document.getElementById('al-cover').value)||40;
+  const premium=parseFloat(document.getElementById('al-premium').value)||3500;
+  const deduct=parseFloat(document.getElementById('al-deduct').value)||25000;
+  const contents=parseFloat(document.getElementById('al-contents').value)||15;
+  const risk=document.getElementById('al-risk').value;
+  const review=document.getElementById('al-review').value;
+  
+  const coverageRatio=(cover/value)*100;
+  const contentsRatio=(cover*0.2);
+  const alerts=[];
+  
+  // Main coverage gap
+  if(coverageRatio<80){
+    alerts.push({type:'danger',ico:'🚨',title:'Severely Underinsured',desc:`Your coverage (₹${cover}L) is only ${coverageRatio.toFixed(0)}% of your property value (₹${value}L). Standard is 80%+. Gap: ₹${(value*0.8-cover).toFixed(1)}L`,gap:`₹${(value*0.8-cover).toFixed(1)}L gap`,cls:'danger'});
+  } else if(coverageRatio<95){
+    alerts.push({type:'warn',ico:'⚠️',title:'Slightly Underinsured',desc:`Your coverage is ${coverageRatio.toFixed(0)}% of property value. Rebuild costs often exceed market value. Consider increasing by ₹${(value*0.95-cover).toFixed(1)}L`,gap:`₹${(value*0.95-cover).toFixed(1)}L short`,cls:'warn'});
+  } else {
+    alerts.push({type:'ok',ico:'✅',title:'Property Coverage: Adequate',desc:`Your coverage (₹${cover}L) is ${coverageRatio.toFixed(0)}% of property value — above the recommended 80% minimum.`,gap:'On track',cls:'ok'});
+  }
+  
+  // Contents
+  if(contents < contentsRatio){
+    alerts.push({type:'warn',ico:'📦',title:'Contents Potentially Undervalued',desc:`Your contents coverage of ₹${contents}L may be low for a ₹${cover}L property. Consider a home inventory to verify actual replacement cost.`,gap:`Review needed`,cls:'warn'});
+  } else {
+    alerts.push({type:'ok',ico:'📦',title:'Contents Coverage: Acceptable',desc:`₹${contents}L in contents coverage is reasonable for your property value.`,gap:'Adequate',cls:'ok'});
+  }
+  
+  // Deductible
+  if(deduct>50000){
+    alerts.push({type:'warn',ico:'💰',title:'High Deductible Risk',desc:`Your ₹${(deduct/1000).toFixed(0)}K deductible means you shoulder significant costs before coverage kicks in. Ensure you have liquid emergency reserves to cover this.`,gap:`₹${(deduct/1000).toFixed(0)}K exposure`,cls:'warn'});
+  } else {
+    alerts.push({type:'ok',ico:'💰',title:'Deductible: Manageable',desc:`Your ₹${(deduct/1000).toFixed(0)}K deductible is within normal range. Pair with a ₹${(deduct/1000).toFixed(0)}K emergency fund.`,gap:'OK',cls:'ok'});
+  }
+  
+  // Risk zone
+  if(risk.includes('High')){
+    alerts.push({type:'danger',ico:'🌊',title:'High-Risk Zone: Flood Coverage Required',desc:'You are in a high-risk zone. Standard home insurance EXCLUDES flood damage. A separate flood policy is strongly recommended — losses can exceed ₹10L+ without it.',gap:'Flood uninsured',cls:'danger'});
+  }
+  
+  // Review age
+  if(review.includes('3-5')||review.includes('Never')){
+    alerts.push({type:'warn',ico:'📅',title:'Policy Review Overdue',desc:'Property values have increased significantly in recent years. A policy reviewed 3+ years ago is likely to have a significant coverage gap due to inflation.',gap:'Review overdue',cls:'warn'});
+  }
+  
+  // Premium adequacy
+  const expectedPremium=value*0.002*12; // rough estimate
+  if(premium<expectedPremium*0.5){
+    alerts.push({type:'danger',ico:'💸',title:'Premium May Indicate Under-coverage',desc:`Your monthly premium of ₹${premium} appears low for a ₹${value}L property. Very low premiums often come with high deductibles, exclusions, or coverage limits — review your policy documents carefully.`,gap:'Policy review critical',cls:'danger'});
+  }
+  
+  const dangerCount=alerts.filter(a=>a.type==='danger').length;
+  const warnCount=alerts.filter(a=>a.type==='warn').length;
+  const summaryColor=dangerCount>0?'var(--rose)':warnCount>0?'var(--gold)':'var(--teal)';
+  const summaryIcon=dangerCount>0?'🚨':warnCount>0?'⚠️':'✅';
+  const summaryText=dangerCount>0?`CRITICAL: ${dangerCount} serious gap${dangerCount>1?'s':''} detected. Immediate action required.`:warnCount>0?`${warnCount} potential gap${warnCount>1?'s':''} detected. Review recommended.`:'Your coverage appears adequate. Annual reviews recommended.';
+  
+  const html=`
+    <div class="alert-summary" style="border-color:${summaryColor}40;background:${summaryColor}15">
+      <div class="alert-icon-big">${summaryIcon}</div>
+      <div class="alert-text">
+        <h4 style="color:${summaryColor}">Coverage Analysis Complete</h4>
+        <p>${summaryText}</p>
+      </div>
+    </div>
+    <div class="alert-items">
+      ${alerts.map(a=>`<div class="alert-item ${a.cls}">
+        <div class="alert-indicator ind-${a.cls}">${a.ico}</div>
+        <div class="alert-detail"><h5>${a.title}</h5><p>${a.desc}</p></div>
+        <div class="alert-gap gap-${a.cls}">${a.gap}</div>
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:20px;padding:20px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:var(--rad2);font-size:13px;color:var(--white3);line-height:1.7">
+      💡 <strong style="color:var(--gold2)">Next steps:</strong> Contact your insurer to address any critical gaps. Request a full policy review and ask specifically about flood, earthquake, and contents endorsements.
+    </div>`;
+  
+  const results=document.getElementById('alertResults');
+  results.innerHTML=html;
+  results.classList.add('show');
+  results.scrollIntoView({behavior:'smooth'});
+}
+
+// ─── BIAS DETECTOR ───
+const biasPresets=[
+  `Subject: Your Exclusive Home Insurance Quote — LIMITED TIME
+
+Dear Valued Client,
+
+Based on our premium assessment, I've put together a comprehensive package that I believe is PERFECT for you. 
+
+Plan: PremiumShield Elite Plus (₹28,500/month)
+- This is our BEST-SELLING plan and is highly recommended by our top advisors
+- I've added our UltraProtect Rider (₹4,200/month) for complete peace of mind
+- Our CrystalClear Endorsement Bundle (₹2,800/month) is also included
+- This offer EXPIRES in 48 hours — act now to secure this exclusive rate!
+
+As your trusted advisor, I always put your interests first. This package gives you the most comprehensive coverage available.
+
+Best regards,
+Rajiv Sharma, Senior Insurance Advisor`,
+
+  `Dear Customer,
+
+Thank you for requesting a home insurance quote. Based on your property details:
+
+Property Value: ₹75,00,000
+Recommended Coverage: ₹75,00,000 (replacement cost basis)
+
+We recommend:
+- Basic Home Policy: ₹2,100/month (covers structural damage, theft, liability)
+- Optional flood endorsement: ₹800/month (given your location)
+
+Please review the policy document carefully, particularly Section 4 (Exclusions) and Section 7 (Claim Procedures). You have 30 days to review before committing.`,
+
+  `Hi! So I've been in insurance for 15 years and let me tell you, the ULIP plan I'm recommending is literally the best of both worlds. You get insurance AND investment returns — imagine your ₹12,000 monthly premium growing to ₹50 lakh! Most of my clients who've switched to this are SO happy. The returns are basically guaranteed (we say "assured" in the documentation), and if you don't buy now, this rate goes up next month. My commission doesn't affect my recommendation at all — this is purely what's best for your family.`,
+
+  `Our SmartWealth ULIP Plan offers guaranteed market-beating returns with life insurance bundled in! Your ₹10,000/month builds wealth AND protects your family. Returns historically average 18% per year (past performance). Lock-in period of just 5 years. Surrender charges apply only in years 1-4. Our relationship manager will explain the rest in person — this plan has been approved by IRDAI and is fully compliant.`
+];
+function loadPreset(i){document.getElementById('biasText').value=biasPresets[i];}
+
+function runBiasDetector(){
+  const text=document.getElementById('biasText').value.trim();
+  if(!text){showToast('Please paste some text to analyze');return;}
+  
+  // Bias detection logic
+  const flags=[];
+  const lc=text.toLowerCase();
+  
+  // Urgency tactics
+  if(lc.match(/expires?|limited time|act now|urgent|hurry|deadline|48 hours|24 hours/)){
+    flags.push({cat:'Urgency Tactics',score:85,color:'#e85d8a',desc:'Uses artificial time pressure ("expires", "act now", "limited time") to prevent careful evaluation. A legitimate insurance offer does not need a 48-hour deadline.'});
+  }
+  // Upselling signals
+  const riderCount=(lc.match(/rider|endorsement|add-on|bundle|plus|elite|premium|ultra/g)||[]).length;
+  if(riderCount>=3){
+    flags.push({cat:'Excessive Bundling / Upsell',score:75,color:'#f0a030',desc:`Multiple riders/endorsements pushed (detected ${riderCount} upsell signals). Each add-on earns commission. Ask: "Which of these does my situation actually require?"`});
+  }
+  // Commission language
+  if(lc.match(/commission|my recommendation|i always put your interests|trust me|15 years|top advisor|best-selling/)){
+    flags.push({cat:'Self-Interest / Conflict of Interest',score:90,color:'#e85d8a',desc:'Language suggests agent is prioritizing personal relationships or sales records over objective analysis. "Best-selling" or "most advisors recommend" does not mean best for YOUR situation.'});
+  }
+  // ULIP/hybrid product push
+  if(lc.match(/ulip|best of both worlds|investment.{0,20}insurance|insurance.{0,20}investment|returns.{0,30}guaranteed|wealth.{0,20}protect/)){
+    flags.push({cat:'ULIP / Hybrid Product Bias',score:95,color:'#e85d8a',desc:'ULIPs (Unit-Linked Insurance Plans) typically have high charges (3-5%) and provide suboptimal returns vs. pure insurance + pure investment strategies. Regulators warn consumers to compare carefully.'});
+  }
+  // Return claims
+  if(lc.match(/guaranteed.{0,20}return|18%|20%|market-beating|historically average|assured return/)){
+    flags.push({cat:'Misleading Return Claims',score:92,color:'#e85d8a',desc:'Insurance-linked "guaranteed" or "historically average" return claims are often misleading. Past performance language used for insurance products may violate IRDAI advertising guidelines.'});
+  }
+  // Vague exclusions
+  if(!lc.match(/exclusion|section|policy document|review/)){
+    flags.push({cat:'Exclusion Transparency',score:60,color:'#f0a030',desc:'Quote does not mention exclusions or direct you to policy exclusion sections. Any legitimate quote should proactively highlight what is NOT covered.'});
+  }
+  // Missing deductible info
+  if(!lc.match(/deductible|excess|excess amount/)){
+    flags.push({cat:'Deductible Not Disclosed',score:45,color:'#f0a030',desc:'Quote does not mention deductible/excess amounts. This is a key cost that significantly affects your out-of-pocket expenses on any claim.'});
+  }
+  // Positive signals
+  const positives=[];
+  if(lc.match(/exclusion|policy document|review carefully|30 days|section/)) positives.push('✓ References policy documents and exclusions transparently');
+  if(lc.match(/optional|if you want|consider|up to you/)) positives.push('✓ Uses optional language rather than pressure');
+  if(!lc.match(/expires?|limited time|act now/)) positives.push('✓ No artificial urgency pressure detected');
+  if(lc.match(/replacement cost|rebuild cost/)) positives.push('✓ Uses proper coverage valuation methodology');
+  
+  const avgBias=flags.length>0?Math.round(flags.reduce((s,f)=>s+f.score,0)/flags.length):10;
+  const biasLabel=avgBias>75?'High Bias':avgBias>45?'Moderate Bias':'Low Bias';
+  const gaugeColor=avgBias>75?'var(--rose)':avgBias>45?'var(--gold)':'var(--teal)';
+  const circumference=2*Math.PI*50;
+  const dashOffset=circumference*(1-avgBias/100);
+  
+  document.getElementById('biasResults').innerHTML=`
+    <div class="bias-score-wrap">
+      <div class="bias-gauge">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="gauge-bg" cx="60" cy="60" r="50"/>
+          <circle class="gauge-fill" cx="60" cy="60" r="50" stroke="${gaugeColor}" stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"/>
+        </svg>
+        <div class="gauge-label"><div class="gauge-pct" style="color:${gaugeColor}">${avgBias}%</div><div class="gauge-sub">BIAS SCORE</div></div>
+      </div>
+      <div class="bias-summary">
+        <h4>${biasLabel} Detected — ${flags.length} Issue${flags.length!==1?'s':''} Found</h4>
+        <p style="font-size:13px;color:var(--white3);line-height:1.6">
+          ${avgBias>75?'This quote contains multiple high-risk bias signals. Proceed with significant caution. Get competing quotes before deciding.':avgBias>45?'Moderate bias detected. Some elements warrant scrutiny. Ask for clarification on flagged items.':'This quote appears relatively balanced, but always read the full policy document before committing.'}
+        </p>
+        ${positives.length?`<div style="margin-top:12px">${positives.map(p=>`<div style="font-size:12px;color:var(--teal2);margin-top:4px">${p}</div>`).join('')}</div>`:''}
+      </div>
+    </div>
+    ${flags.length>0?`<div class="bias-categories">
+      ${flags.map(f=>`<div class="bias-cat">
+        <div class="bias-cat-name">⚑ ${f.cat}</div>
+        <div class="bias-bar-wrap"><div class="bias-bar-fill" style="width:${f.score}%;background:${f.color}"></div></div>
+        <div class="bias-cat-val" style="color:${f.color};font-weight:600;margin-bottom:8px">${f.score}% bias confidence</div>
+        <div style="font-size:12px;color:var(--white3);line-height:1.5">${f.desc}</div>
+      </div>`).join('')}
+    </div>`:'<div style="color:var(--teal2);font-size:14px;padding:20px;text-align:center">✅ No significant bias patterns detected in this text.</div>'}
+    <div style="margin-top:20px;padding:20px;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:var(--rad2)">
+      <div style="font-size:14px;font-weight:700;color:var(--gold2);margin-bottom:10px">🛡️ Your Rights as a Policyholder</div>
+      <div style="font-size:13px;color:#6b4858;line-height:1.7">You have the right to: (1) Request an itemized breakdown of all fees and commissions. (2) Ask for 30 days to review any policy. (3) Get competing quotes from at least 3 providers. (4) File a complaint with IRDAI (1800-4254-732) if you believe you've been misled.</div>
+    </div>`;
+  document.getElementById('biasResults').classList.add('show');
+  document.getElementById('biasResults').scrollIntoView({behavior:'smooth'});
+}
+
+// ─── PLANS ───
+const plans=[
+  {name:'Essential',price:'₹2,499',per:'/mo',desc:'For renters and light coverage needs',popular:false,features:[
+    {y:true,t:'Structural damage up to ₹25L'},{y:true,t:'Theft coverage up to ₹2.5L'},{y:true,t:'Personal liability ₹5L'},
+    {y:true,t:'Basic claims support (email)'},
+    {y:false,t:'Flood endorsement available'},{y:false,t:'Replacement cost coverage'},{y:false,t:'Home business add-on'},{y:false,t:'24/7 priority claims line'}]},
+  {name:'Comprehensive',price:'₹5,999',per:'/mo',desc:'The most popular choice for homeowners',popular:true,features:[
+    {y:true,t:'Structural damage up to ₹75L'},{y:true,t:'Theft coverage up to ₹10L'},{y:true,t:'Personal liability ₹20L'},
+    {y:true,t:'Replacement cost coverage'},{y:true,t:'Flood endorsement available'},{y:true,t:'24/7 claims support'},
+    {y:false,t:'Home business add-on'},{y:false,t:'Jewelry rider included'}]},
+  {name:'Elite',price:'₹11,999',per:'/mo',desc:'Complete protection with zero surprises',popular:false,features:[
+    {y:true,t:'Structural damage up to ₹1.5Cr'},{y:true,t:'Theft — no sub-limits'},{y:true,t:'Personal liability ₹50L'},
+    {y:true,t:'Replacement cost — all items'},{y:true,t:'Flood + earthquake included'},
+    {y:true,t:'Home business covered'},{y:true,t:'Jewelry rider included'},{y:true,t:'Dedicated claims manager'}]}
+];
+function renderPlans(){
+  document.getElementById('plansGrid').innerHTML=plans.map(p=>`
+    <div class="plan-card ${p.popular?'popular':''}">
+      ${p.popular?'<div class="plan-badge">⭐ Most Popular</div>':''}
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price}<span>${p.per}</span></div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-feats">${p.features.map(f=>`<li class="${f.y?'yes':'no'}"><span class="pf-tick">${f.y?'✓':'✗'}</span>${f.t}</li>`).join('')}</ul>
+      <button class="plan-btn" onclick="showToast('Opening ${p.name} enrollment…')">Choose ${p.name} →</button>
+    </div>`).join('');
+}
+
+// ─── GLOSSARY ───
+const glossTerms=[
+  {term:'Premium',def:'The amount you pay for your insurance policy, typically monthly or annually.',ex:'Example: Your ₹5,999/month home insurance payment is your premium.'},
+  {term:'Deductible (Excess)',def:'The amount you pay out-of-pocket before your insurer pays anything on a claim.',ex:'Example: ₹25,000 deductible means you pay the first ₹25K; insurer covers the rest.'},
+  {term:'Claim',def:'A formal request to your insurer asking them to pay for a covered loss or damage.',ex:'Example: After a break-in, you file a claim for your stolen laptop.'},
+  {term:'Coverage Limit',def:'The maximum amount your insurer will pay for a covered loss.',ex:'Example: Your policy has a ₹75L coverage limit for structural damage.'},
+  {term:'Exclusion',def:'A specific event, item, or situation that your policy explicitly does NOT cover.',ex:'Example: Flood damage is a common exclusion in standard home policies in India.'},
+  {term:'Liability',def:'Legal responsibility for damage or injury you cause to others.',ex:'Example: If a guest breaks their leg at your home, your liability coverage helps.'},
+  {term:'Endorsement / Rider',def:'An add-on to your policy that extends or modifies your coverage.',ex:'Example: A jewelry rider increases coverage limits for valuable jewelry above base limits.'},
+  {term:'Actual Cash Value (ACV)',def:'The value of an item after depreciation — what it\'s worth today, not what you paid.',ex:'Example: Your 4-year-old TV bought for ₹50K might only get ₹15K at ACV.'},
+  {term:'Replacement Cost',def:'The full cost to replace a damaged item with a brand-new equivalent, no depreciation deducted.',ex:'Example: Replacement cost would give you ₹50K to buy a new TV, not ₹15K.'},
+  {term:'Subrogation',def:'Your insurer\'s right to pursue the party who caused your loss after paying your claim.',ex:'Example: After paying for your storm repairs, your insurer pursues the responsible contractor.'},
+  {term:'Indemnity',def:'The principle that insurance restores you to your pre-loss position — not profit from it.',ex:'Example: Insurance pays for your damaged fence, not for a bigger, nicer fence.'},
+  {term:'Underwriting',def:'The process insurers use to evaluate your risk and set your premium price.',ex:'Example: Your credit score, location, and home age all affect underwriting decisions.'},
+  {term:'IDV (Insured Declared Value)',def:'The maximum amount an insurer will pay in case of total loss of a vehicle — essentially its current market value.',ex:'Example: If your car\'s IDV is ₹8L and it\'s stolen, you receive up to ₹8L.'},
+  {term:'No Claim Bonus (NCB)',def:'A discount on your renewal premium for every claim-free year. Can accumulate to 50% off.',ex:'Example: 5 claim-free years on auto insurance may earn 50% NCB discount.'},
+  {term:'Co-insurance',def:'A shared payment arrangement where both you and your insurer pay a portion of claims.',ex:'Example: 80/20 co-insurance means insurer pays 80%, you pay 20% after deductible.'},
+  {term:'Named Perils',def:'A policy that ONLY covers events specifically listed — if it\'s not listed, it\'s not covered.',ex:'Example: Named perils policies list fire, theft, windstorm — but not flood unless specified.'},
+  {term:'All-Risk Policy',def:'A policy that covers ALL causes of loss EXCEPT those specifically excluded — much broader protection.',ex:'Example: All-risk policies cover unknown or unforeseen events, unless explicitly excluded.'},
+  {term:'Umbrella Policy',def:'Extra liability coverage beyond your standard policy limits — typically ₹1Cr+.',ex:'Example: If sued for ₹60L but your home policy only covers ₹30L, umbrella covers the rest.'},
+  {term:'Grace Period',def:'A window of time after your payment due date before your policy is cancelled.',ex:'Example: A 30-day grace period means late payment won\'t immediately cancel coverage.'},
+  {term:'ULIP',def:'Unit-Linked Insurance Plan — combines life insurance with investment (mutual fund-like) in one product. Generally offers inferior value vs. separate products.',ex:'Example: ₹10K/month ULIP vs ₹2K term insurance + ₹8K mutual fund investment often favors the latter.'},
+];
+function renderGloss(filter=''){
+  const terms=filter?glossTerms.filter(t=>t.term.toLowerCase().includes(filter.toLowerCase())||t.def.toLowerCase().includes(filter.toLowerCase())):glossTerms;
+  document.getElementById('glossGrid').innerHTML=terms.length?terms.map(t=>`<div class="gloss-card"><div class="gloss-term">${t.term}</div><div class="gloss-def">${t.def}</div><div class="gloss-ex">${t.ex}</div></div>`).join(''):'<div style="color:var(--white3);font-size:14px;padding:20px">No terms found — try a different search.</div>';
+}
+function filterGloss(v){renderGloss(v);}
+
+// ─── CLAIM GUIDE ───
+const claimSteps=[
+  {num:1,title:'Stay Safe First',body:'Before anything else, make sure everyone is out of harm\'s way. If there\'s fire, flooding, or structural damage, leave the property and call emergency services (100/101).',tip:'📞 Call emergency services first — your insurer comes second.'},
+  {num:2,title:'Document Everything Immediately',body:'Take photos and videos of all damage before touching or moving anything. Capture wide shots and close-ups. Timestamp your photos if possible — phone cameras do this automatically.',tip:'📸 More documentation = faster, larger payout. Insurers reward evidence.'},
+  {num:3,title:'Prevent Further Damage (if safe)',body:'Cover broken windows, tarp a damaged roof, or pump out water — but only if you can do so safely. Failing to mitigate damage can reduce your claim payout significantly.',tip:'🔧 Keep all receipts for emergency repairs — they\'re typically reimbursable.'},
+  {num:4,title:'Notify Your Insurer Promptly',body:'Call your insurer\'s claims line or file online within 24–48 hours. Provide your policy number, describe the loss clearly, and ask for a claim reference number.',tip:'⏰ Most policies require "prompt" notification — don\'t wait days. 48 hours is ideal.'},
+  {num:5,title:'File a Police Report if Needed',body:'For theft, vandalism, or car damage, a police report (FIR) is usually required before your insurer will process the claim. Get the FIR number and a certified copy.',tip:'📋 No FIR = no claim for theft or vandalism. File it the same day.'},
+  {num:6,title:'Meet the Claims Surveyor',body:'Your insurer will send a licensed surveyor to assess the damage. Be present, be factual, and walk them through everything you documented. Do not understate or overstate.',tip:'💼 You can hire an independent licensed surveyor if you disagree with their assessment.'},
+  {num:7,title:'Review the Settlement Offer',body:'Read the settlement carefully. If you disagree, you have the right to dispute it. Gather contractor quotes as evidence of true repair costs and submit a formal counter-claim.',tip:'⚖️ First settlement offers are often conservative. Negotiate with supporting evidence.'},
+  {num:8,title:'Escalate if Needed',body:'If your insurer unreasonably delays or denies your claim, file a complaint with IRDAI\'s Grievance Redressal Cell or approach the Insurance Ombudsman for your region.',tip:'🏛️ IRDAI Toll-Free: 1800-4254-732 · Insurance Ombudsman: igms.irda.gov.in'}
+];
+function renderClaim(){
+  document.getElementById('claimFlow').innerHTML=claimSteps.map(s=>`
+    <div class="flow-step">
+      <div class="flow-num">${s.num}</div>
+      <div class="flow-content">
+        <h4>${s.title}</h4>
+        <p>${s.body}</p>
+        <div class="flow-tip">${s.tip}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── INIT ───
+goPage('home');
+calcReality();
+</script>
+</body>
+</html>
